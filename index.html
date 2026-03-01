@@ -4,7 +4,26 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
-<title>DavElec — v439 (Obras Anexos + ZIP)</title>
+<title>DavElec — v451 (PWA Hotfix)</title>
+<script>
+/* v451 hotfix: remove corrupted storage values (HTML/404) that crash JSON.parse on Android/GitHub Pages */
+(function(){
+  try{
+    const storages = [localStorage, sessionStorage];
+    storages.forEach((st)=>{
+      if(!st) return;
+      for(let i=st.length-1;i>=0;i--){
+        const k = st.key(i);
+        const v = st.getItem(k);
+        if(typeof v === "string" && v.trim().startsWith("<")){
+          st.removeItem(k);
+        }
+      }
+    });
+  }catch(e){}
+})();
+</script>
+
 <style>
 /* ========== VARIÁVEIS E BASE ========== */
 :root{

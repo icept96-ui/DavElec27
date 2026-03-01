@@ -1,5 +1,5 @@
-/* DavElec PWA Service Worker (v450) */
-const CACHE_VERSION = "davelec-v450";
+/* DavElec PWA Service Worker (v451) */
+const CACHE_VERSION = "davelec-v451";
 const CORE_ASSETS = [
   "./",
   "./index.html",
