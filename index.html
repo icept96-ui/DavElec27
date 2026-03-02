@@ -1878,7 +1878,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
-  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -9623,7 +9623,7 @@ function quadro_export_pdf(){
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
-  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -9819,12 +9819,10 @@ function quadro_export_pdf(){
     try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
   };
 })();
-if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw.js?v=450').catch(function(){});
+);
   });
 }
-</script>
+<\/script>
 
 </body>
 </html>`;
@@ -12350,7 +12348,7 @@ renderSavedBudgets();
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
-  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12758,9 +12756,7 @@ renderSavedBudgets();
     try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
   };
 })();
-if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw.js?v=450').catch(function(){});
+);
   });
 }
 </script>
@@ -17823,9 +17819,7 @@ function installOpenSchemaFallback(){
     try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
   };
 })();
-if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw.js?v=450').catch(function(){});
+);
   });
 }
 </script>
