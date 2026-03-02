@@ -1,60 +1,56 @@
-/* DavElec Service Worker v454 */
-const CACHE_NAME = 'davelec-v454';
-const CORE = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './icon-192.png',
-  './icon-512.png'
+/* DavElec PWA service worker (v455) */
+const CACHE_NAME = "davelec-v455-20260302";
+const CORE_ASSETS = [
+  "./",
+  "./index.html",
+  "./manifest.webmanifest",
+  "./icon-192.png",
+  "./icon-512.png"
 ];
 
-self.addEventListener('install', (event) => {
-  event.waitUntil((async()=>{
-    const cache = await caches.open(CACHE_NAME);
-    await cache.addAll(CORE);
-    await self.skipWaiting();
-  })());
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS)).then(() => self.skipWaiting())
+  );
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil((async()=>{
+self.addEventListener("activate", (event) => {
+  event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.map(k => (k!==CACHE_NAME) ? caches.delete(k) : Promise.resolve()));
+    await Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : Promise.resolve())));
     await self.clients.claim();
   })());
 });
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   const req = event.request;
-  if(req.method !== 'GET') return;
+  const url = new URL(req.url);
 
-  event.respondWith((async()=>{
-    const url = new URL(req.url);
-    if(url.origin !== self.location.origin) return fetch(req);
+  // Only handle same-origin
+  if (url.origin !== self.location.origin) return;
 
-    if(req.mode === 'navigate') {
+  // Network-first for navigations (so updates propagate), fallback to cache
+  if (req.mode === "navigate") {
+    event.respondWith((async () => {
       try {
         const fresh = await fetch(req);
         const cache = await caches.open(CACHE_NAME);
-        cache.put('./', fresh.clone());
-        cache.put('./index.html', fresh.clone());
+        cache.put("./index.html", fresh.clone());
         return fresh;
-      } catch(e) {
-        const cached = await caches.match('./') || await caches.match('./index.html');
-        return cached || new Response('Offline', {status:503, headers:{'Content-Type':'text/plain'}});
+      } catch (e) {
+        const cached = await caches.match("./index.html");
+        return cached || new Response("Offline", { status: 503, headers: { "Content-Type": "text/plain" } });
       }
-    }
+    })());
+    return;
+  }
 
-    const cached = await caches.match(req);
-    if(cached) return cached;
-
-    try {
-      const fresh = await fetch(req);
-      const cache = await caches.open(CACHE_NAME);
-      if(fresh && fresh.ok && fresh.type === 'basic') cache.put(req, fresh.clone());
-      return fresh;
-    } catch(e) {
-      return cached || new Response('Offline', {status:503, headers:{'Content-Type':'text/plain'}});
-    }
-  })());
+  // Cache-first for assets
+  event.respondWith(
+    caches.match(req).then((cached) => cached || fetch(req).then((resp) => {
+      const copy = resp.clone();
+      caches.open(CACHE_NAME).then((cache) => cache.put(req, copy)).catch(()=>{});
+      return resp;
+    }))
+  );
 });
