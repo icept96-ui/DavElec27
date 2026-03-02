@@ -4,65 +4,30 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
-<title>DavElec — v458 (PWA GitHub Fix)</title>
+<title>DavElec — v451 (PWA Hotfix)</title>
 <script>
 
-/* v458: HARD FIX for GitHub Pages "Unexpected token '<'" caused by corrupted storage/404 HTML.
-   - sanitize ALL storage entries that look like HTML
-   - make JSON.parse resilient (returns null instead of throwing on invalid JSON)
-   - reset old service workers/caches from previous builds (one-time self-heal)
-*/
+/* ===== DavElec GitHub/PWA bootstrap (v460) ===== */
 (function(){
-  // Make JSON.parse resilient to corrupted values (HTML/404 etc.)
-  const __origParse = JSON.parse;
-  JSON.parse = function(text, reviver){
-    try{
-      if(typeof text === 'string'){
-        const t = text.replace(/^\uFEFF/, '').trimStart();
-        if(t.startsWith('<') || t.startsWith('<!--')) return null;
-      }
-      return __origParse.call(this, text, reviver);
-    }catch(e){
-      return null;
-    }
-  };
-
-  // Sanitize local/session storage: remove any value that looks like HTML (often 404 pages)
-  function sanitizeStorage(st){
-    try{
-      if(!st) return;
-      for(let i=st.length-1;i>=0;i--){
-        const k = st.key(i);
-        const v = st.getItem(k);
-        if(typeof v !== 'string') continue;
-        const t = v.replace(/^\uFEFF/, '').trimStart();
-        if(t.startsWith('<') || t.startsWith('<!--') || t.startsWith('<!DOCTYPE') || t.startsWith('<html')){
-          st.removeItem(k);
-        }
-      }
-    }catch(e){}
+  // localStorage safe helpers (some modules expect these globals)
+  if (!window.__DAV_LS_GET__) {
+    window.__DAV_LS_GET__ = function(key, fallback){
+      try{
+        const v = localStorage.getItem(key);
+        return v===null ? fallback : JSON.parse(v);
+      }catch(e){ return fallback; }
+    };
   }
-  sanitizeStorage(localStorage);
-  sanitizeStorage(sessionStorage);
-
-  // One-time reset of old SW/caches that may serve wrong content for JS files
-  (async()=>{
-    try{
-      if(!('serviceWorker' in navigator)) return;
-      const regs = await navigator.serviceWorker.getRegistrations();
-      for(const r of regs){
-        const url = (r && r.active && r.active.scriptURL) ? r.active.scriptURL : (r && r.installing && r.installing.scriptURL) ? r.installing.scriptURL : '';
-        if(url && !url.includes('sw.js')){
-          await r.unregister();
-        }
-      }
-      if(window.caches && caches.keys){
-        const keys = await caches.keys();
-        await Promise.all(keys.filter(k=>/^davelec-/.test(k) && !/v458/.test(k)).map(k=>caches.delete(k)));
-      }
-    }catch(e){}
-  })();
+  if (!window.__DAV_LS_SET__) {
+    window.__DAV_LS_SET__ = function(key, value){
+      try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
+    };
+  }
+  // Avoid "Cannot access DIAG_* before initialization" across cached/old code paths
+  if (typeof window.DIAG_CAT === 'undefined') window.DIAG_CAT = 'ALL';
+  if (typeof window.DIAG_PROBLEMAS === 'undefined') window.DIAG_PROBLEMAS = [];
 })();
+
 /* v451 hotfix: remove corrupted storage values (HTML/404) that crash JSON.parse on Android/GitHub Pages */
 (function(){
   try{
@@ -1913,10 +1878,12 @@ window.addEventListener('DOMContentLoaded', ()=>{
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
-  <link rel="manifest" href="./manifest.webmanifest?v=456">
+  <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta http-equiv="Cache-Control" content="no-store, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
 </head>
 <body>
 
@@ -7025,7 +6992,7 @@ async function pdfFromJpegs(jpegs, wPt, hPt) {
 
 
 /* ====== AVARIAS / DIAGNÓSTICO ====== */
-const DIAG_PROBLEMAS = [
+var DIAG_PROBLEMAS = (window.DIAG_PROBLEMAS = [
 {
     id: "dj_desarma",
     t: "Disjuntor (DJ) desarma / vai abaixo",
@@ -8710,10 +8677,10 @@ const DIAG_PROBLEMAS = [
     }
 
 
-];
+]);
 
 
-let DIAG_CAT = 'ALL';
+var DIAG_CAT = (window.DIAG_CAT = 'ALL');
 
 function diag_setCat(cat){
   DIAG_CAT = cat || 'ALL';
@@ -9566,38 +9533,303 @@ function quadro_export_pdf(){
   if(!w){ alert('O navegador bloqueou a janela. Permite pop-ups para exportar PDF.'); return; }
 
   const page = `<!doctype html>
-<html lang="pt">
+<html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DavElec — Quadro / Resumo</title>
-<style>
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:20px;color:#111}
-  h1,h2,h3{margin:0 0 10px 0}
-  .card{border:1px solid #ddd;border-radius:12px;padding:14px;margin:0 0 14px 0}
-  .muted{color:#555}
-  table{width:100%;border-collapse:collapse;margin-top:10px}
-  th,td{border-bottom:1px solid #eee;padding:8px 6px;text-align:left;font-size:13px}
-  th{background:#f7f7f7}
-  @media print{ body{margin:10mm} .noPrint{display:none} }
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>DavElec - Quadro</title>
+  <style>
+    @page{ size:A4 landscape; margin:10mm; }
+    body{ font-family: Arial, sans-serif; color:#111; }
+    .hdr{ display:flex; align-items:flex-start; justify-content:space-between; gap:10mm; margin-bottom:6mm; }
+    .brand{ display:flex; align-items:center; gap:10px; }
+    .logoMark{ width:28px; height:28px; border-radius:10px; background:#111; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-weight:900; }
+    .logoTxt{ font-weight:900; font-size:18px; letter-spacing:.2px; }
+    .sub{ font-size:11px; color:#444; margin-top:3px; line-height:1.25; }
+    .metaR{ text-align:right; font-size:10.5px; color:#444; max-width:88mm; line-height:1.25; }
+    .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:6mm; margin-bottom:6mm; }
+    .box{ border:1px solid #e6e6e6; border-radius:10px; padding:4.5mm; }
+    .box h3{ margin:0 0 3mm 0; font-size:12px; }
+    .kvs{ display:grid; grid-template-columns: 1fr 1fr; gap:2mm 5mm; font-size:10.5px; }
+    .kvs .k{ color:#666; }
+    .kvs .v{ font-weight:700; text-align:right; }
+    .panel{ border:1px solid #e6e6e6; border-radius:12px; padding:4mm; }
+    svg{ width:100%; height:auto; display:block; }
+    table{ width:100%; border-collapse:collapse; margin-top:6mm; font-size:10.5px; }
+    th,td{ border-bottom:1px solid #eee; padding:6px 6px; vertical-align:top; }
+    th{ text-align:left; background:#fafafa; font-size:10px; text-transform:uppercase; letter-spacing:.2px; color:#333; }
+    td.num{ text-align:right; white-space:nowrap; }
+    tr.grp td{ background:#f6f7fb; border-top:1px solid #e6e6e6; font-size:10.5px; }
+    .c1{ width:38%; }
+    .muted{ color:#666; }
+    .foot{ margin-top:4mm; font-size:9.5px; color:#666; display:flex; justify-content:space-between; }
+  
+/* Clamp texts inside DIN modules (prevents overflow) */
+.dinBox .name,.dinBox .sub,.dinBox .meta{overflow:hidden;text-overflow:ellipsis;word-break:break-word}
+.dinBox .name{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;max-height:2.6em}
 </style>
+<style id="dinCarouselFix">
+/* ===== Quadro (DIN): carrossel horizontal por fila (Android/WebView safe) ===== */
+#q_canvas .dinRow{
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  -webkit-overflow-scrolling:touch;
+  scroll-snap-type:x mandatory;
+  scroll-padding-left:10px;
+  overscroll-behavior-x:contain;
+  touch-action:auto !important; /* do NOT force pan-y, allows horizontal swipe */
+  position:relative;
+  scrollbar-width:none;
+}
+#q_canvas .dinRow::-webkit-scrollbar{ display:none; height:0; }
+
+#q_canvas .dinBox,
+#q_canvas .dinFill{
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+}
+
+/* DR (dif.) normalmente ocupa 4 módulos — manter largo e “encaixar” */
+#q_canvas .dinBox.rcd{
+  flex:0 0 calc(var(--modW)*4 + 8px*3) !important; /* 4 módulos + gaps */
+}
+
+/* módulos simples (DJ, etc.) ficam estáveis */
+#q_canvas .dinBox.dj,
+#q_canvas .dinBox.dr,
+#q_canvas .dinFill{
+  flex:0 0 var(--modW) !important;
+}
+
+/* dica visual: fade nas laterais quando existe conteúdo fora do ecrã */
+#q_canvas .dinRow::before,
+#q_canvas .dinRow::after{
+  content:"";
+  position:absolute;
+  top:0; bottom:0;
+  width:18px;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .18s ease;
+}
+#q_canvas .dinRow::before{
+  left:0;
+  background:linear-gradient(90deg, rgba(11,15,22,.95), rgba(11,15,22,0));
+}
+#q_canvas .dinRow::after{
+  right:0;
+  background:linear-gradient(270deg, rgba(11,15,22,.95), rgba(11,15,22,0));
+}
+#q_canvas .dinRow.din-can-left::before{ opacity:1; }
+#q_canvas .dinRow.din-can-right::after{ opacity:1; }
+</style>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
-<body onload="setTimeout(()=>{window.focus();window.print();},250)">
-  <h2>Resumo do Quadro</h2>
-  <div class="card">
-    ${htmlPreview}
+<body>
+  <div class="hdr">
+    <div>
+      <div class="brand">
+        
+        <div>
+          <div class="logoTxt">Quadro Elétrico</div>
+          </div>
+      </div>
+    </div>
+    <div class="metaR">
+      <div><b>Data:</b> ${esc(dt)}</div>
+      <div><b>Sistema:</b> ${esc(sys)}</div>
+</div>
   </div>
-  <div class="card">
-    <h3>Tabela de Circuitos</h3>
-    <div class="muted">Exportado pelo DavElec</div>
-    <div style="overflow:auto">
-      ${tableHtml}
+
+  <div class="grid2">
+    <div class="box">
+      <h3>Resumo</h3>
+      <div class="kvs">
+        <div class="k">Circuitos</div><div class="v">${circN}</div>
+        <div class="k">DDR (Tipo A)</div><div class="v">${drN}</div>
+        <div class="k">Módulos por fila</div><div class="v">${modsPerRow}</div>
+        <div class="k">Filas (detalhe)</div><div class="v">${rowsInfo.length ? esc(rowsInfo.length) : '—'}</div>
+      </div>
+      <div class="sub" style="margin-top:3mm">${escNL(sumText || '—')}</div>
+    </div>
+
+    <div class="box">
+      <h3>Filas DIN</h3>
+      <div class="sub">${rowsInfo.length ? rowsInfo.map(x=>`• ${esc(x)}`).join('<br>') : '—'}</div>
     </div>
   </div>
+
+  <div class="panel">
+    ${pack.svg}
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Circuito</th>
+        <th>Tipo</th>
+        <th class="num">DJ</th>
+        <th class="num">Cabo</th>
+        <th class="num">Comp.</th>
+        <th class="num">P</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${tableHtml}
+    </tbody>
+  </table>
+
+<style id="printDinImproveV2">
+@media print{
+  @page{ size: A4 landscape; margin: 10mm; }
+  /* make the DIN visual occupy full width and be larger */
+  .dinVisualWrap, .dinVisual, #dinVisual, .din-visual, .visualWrap{
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  /* scale up the entire DIN drawing slightly for readability */
+  .dinVisual, #dinVisual, .din-visual{
+    transform: scale(1.0) !important;
+    transform-origin: top left !important;
+  }
+  /* compensate for scaling so it doesn't overflow the page */
+  .dinVisualWrap, .visualWrap, .dinVisualContainer{
+    overflow: hidden !important;
+    padding-bottom: 8mm !important;
+  }
+  /* bigger text inside modules */
+  .dinBox .name, .mod .name, .din-module .name{ font-size: 11px !important; letter-spacing: .05px !important; }
+  .dinBox.dj .mcb{ font-size: 12px !important; font-weight: 950 !important; }
+  .dinBox.dr .name{ font-size: 10.5px !important; }
+  .dinBox .meta .mline, .mod .meta, .din-module .meta{ font-size: 11.5px !important; }
+  /* thicker module borders for print */
+  .dinBox, .mod, .din-module{ border-width: 1.2px !important; }
+  /* reduce excessive white space under header */
+  .headerNote, .noteSmall, .subNote{ display:none !important; }
+}
+/* Screen preview (android) also benefits: */
+.dinVisual, #dinVisual, .din-visual{ zoom: 1.08; }
+</style>
+
+<script id="dinCarouselScript">
+(function(){
+  function updateFades(row){
+    try{
+      const max = row.scrollWidth - row.clientWidth;
+      row.classList.toggle('din-can-left', row.scrollLeft > 2);
+      row.classList.toggle('din-can-right', row.scrollLeft < max - 2);
+    }catch(e){}
+  }
+
+  function enableDinCarousel(){
+    const rows = document.querySelectorAll('#q_canvas .dinRow');
+    rows.forEach(row=>{
+      if(row.dataset.dinCarousel === '1') { updateFades(row); return; }
+      row.dataset.dinCarousel = '1';
+
+      let startX=0, startY=0, startScroll=0;
+      let dragging=false, locked=false, lockAxis=null;
+
+      const onDown = (x,y)=>{
+        startX=x; startY=y;
+        startScroll=row.scrollLeft;
+        dragging=true; locked=false; lockAxis=null;
+      };
+
+      const onMove = (x,y,ev)=>{
+        if(!dragging) return;
+        const dx = x - startX;
+        const dy = y - startY;
+
+        // decide axis once (small threshold)
+        if(!locked){
+          if(Math.abs(dx) + Math.abs(dy) < 10) return;
+          locked=true;
+          lockAxis = (Math.abs(dx) > Math.abs(dy)) ? 'x' : 'y';
+        }
+
+        if(lockAxis === 'x'){
+          // keep horizontal drag inside row
+          try{ ev && ev.preventDefault && ev.preventDefault(); }catch(e){}
+          row.scrollLeft = startScroll - dx;
+          updateFades(row);
+        }
+        // if lockAxis is 'y' let page scroll normally
+      };
+
+      const onUp = ()=>{
+        dragging=false; locked=false; lockAxis=null;
+        updateFades(row);
+      };
+
+      // Touch
+      row.addEventListener('touchstart', (e)=>{
+        const t = e.touches && e.touches[0]; if(!t) return;
+        onDown(t.clientX, t.clientY);
+        updateFades(row);
+      }, {passive:true});
+
+      row.addEventListener('touchmove', (e)=>{
+        const t = e.touches && e.touches[0]; if(!t) return;
+        onMove(t.clientX, t.clientY, e);
+      }, {passive:false});
+
+      row.addEventListener('touchend', onUp, {passive:true});
+      row.addEventListener('touchcancel', onUp, {passive:true});
+
+      // Mouse (desktop)
+      row.addEventListener('mousedown', (e)=>{ onDown(e.clientX, e.clientY); });
+      row.addEventListener('mousemove', (e)=>{ onMove(e.clientX, e.clientY, e); });
+      row.addEventListener('mouseleave', onUp);
+      row.addEventListener('mouseup', onUp);
+
+      row.addEventListener('scroll', ()=>updateFades(row), {passive:true});
+
+      // initial
+      setTimeout(()=>updateFades(row), 50);
+    });
+  }
+
+  window.enableDinCarousel = enableDinCarousel;
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    setTimeout(enableDinCarousel, 350);
+  });
+
+})();
+<\/script>
+
+<script>
+/* PWA + Safe storage parse (Android/WebView friendly) */
+(function(){
+  function safeParse(str, fallback){
+    try{
+      if(str === null || str === undefined || str === "") return fallback;
+      return JSON.parse(str);
+    }catch(e){
+      return fallback;
+    }
+  }
+  window.__DAV_SAFE_PARSE__ = safeParse;
+  window.__DAV_LS_GET__ = function(key, fallback){ return safeParse(localStorage.getItem(key), fallback); };
+  window.__DAV_LS_SET__ = function(key, value){
+    try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
+  };
+})();
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js?v=450').catch(function(){});
+  });
+}
+</script>
+
 </body>
 </html>`;
 
-w.document.open();
+  w.document.open();
   w.document.write(page);
   w.document.close();
   w.focus();
@@ -12118,7 +12350,7 @@ renderSavedBudgets();
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
-  <link rel="manifest" href="./manifest.webmanifest?v=456">
+  <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12131,19 +12363,19 @@ renderSavedBudgets();
         <div>
           <h1>${escapeHtml(empresa)}</h1>
           <div class="sub">
-            ${h.empresaNIF ? ('NIF: '+escapeHtml(h.empresaNIF)+' • ') : ''}
-            ${h.empresaTel ? (escapeHtml(h.empresaTel)+' • ') : ''}
-            ${h.empresaEmail ? escapeHtml(h.empresaEmail) : ''}
+            ${h.empresaNIF ? `NIF: ${escapeHtml(h.empresaNIF)} • ` : ``}
+            ${h.empresaTel ? `${escapeHtml(h.empresaTel)} • ` : ``}
+            ${h.empresaEmail ? `${escapeHtml(h.empresaEmail)}` : ``}
           </div>
-          ${h.empresaMorada ? ('<div class="sub">'+escapeHtml(h.empresaMorada)+'</div>') : ''}
+          ${h.empresaMorada ? `<div class="sub">${escapeHtml(h.empresaMorada)}</div>` : ``}
         </div>
       </div>
 
       <div class="doc">
         <p class="t">ORÇAMENTO</p>
         <div class="meta">
-          ${numero ? ('<div><b>Nº:</b> '+escapeHtml(numero)+'</div>') : ''}
-          ${data ? ('<div><b>Data:</b> '+escapeHtml(data)+'</div>') : ''}
+          ${numero ? `<div><b>Nº:</b> ${escapeHtml(numero)}</div>` : ``}
+          ${data ? `<div><b>Data:</b> ${escapeHtml(data)}</div>` : ``}
           <div><b>Validade:</b> ${escapeHtml(String(validadeDias))} dias</div>
           <div><b>IVA:</b> ${ivaPct}%</div>
         </div>
@@ -12155,14 +12387,14 @@ renderSavedBudgets();
         <h3>Cliente</h3>
         <div class="kv">
           <b>${escapeHtml(cliente)}</b><br/>
-          ${h.clienteNIF ? ('NIF: '+escapeHtml(h.clienteNIF)+'<br/>') : ''}
-          ${h.clienteMorada ? (escapeHtml(h.clienteMorada)+'<br/>') : ''}
+          ${h.clienteNIF ? `NIF: ${escapeHtml(h.clienteNIF)}<br/>` : ``}
+          ${h.clienteMorada ? `${escapeHtml(h.clienteMorada)}<br/>` : ``}
         </div>
       </div>
       <div class="box">
         <h3>Condições</h3>
         <div class="kv">
-          ${h.pagamento ? ('<b>Pagamento:</b> '+escapeHtml(h.pagamento)+'<br/>') : '<span class="muted">Pagamento: —</span><br/>'}
+          ${h.pagamento ? `<b>Pagamento:</b> ${escapeHtml(h.pagamento)}<br/>` : `<span class="muted">Pagamento: —</span><br/>`}
           <b>Moeda:</b> EUR<br/>
           <b>Observações:</b> <span class="muted">Valores sujeitos a confirmação em obra.</span>
         </div>
@@ -12182,7 +12414,7 @@ renderSavedBudgets();
           </tr>
         </thead>
         <tbody>
-          ${rows || '<tr><td colspan="6" style="padding:12px; color:#6b7280;">Sem itens.</td></tr>'}
+          ${rows || `<tr><td colspan="6" style="padding:12px; color:#6b7280;">Sem itens.</td></tr>`}
         </tbody>
       </table>
     </div>
@@ -12190,7 +12422,10 @@ renderSavedBudgets();
     <div class="footerGrid">
       <div class="box">
         <h3>Detalhes do trabalho</h3>
-        ${h.notaGeral ? ('<div class="kv">'+escapeHtml(h.notaGeral).split('\n').join('<br/>')+'</div>') : '<div class="small">—</div>'}
+        ${h.notaGeral
+          ? `<div class="kv">${escapeHtml(h.notaGeral).replace(/\n/g,'<br/>')}</div>`
+          : `<div class="small">—</div>`
+        }
         <div class="small" style="margin-top:10px">
           <b>Aceitação do orçamento:</b> Ao assinar, o cliente declara que leu e aceita os valores e condições deste orçamento.
         </div>
@@ -12504,7 +12739,31 @@ renderSavedBudgets();
   });
 
 })();
+<\/script>
 
+<script>
+/* PWA + Safe storage parse (Android/WebView friendly) */
+(function(){
+  function safeParse(str, fallback){
+    try{
+      if(str === null || str === undefined || str === "") return fallback;
+      return JSON.parse(str);
+    }catch(e){
+      return fallback;
+    }
+  }
+  window.__DAV_SAFE_PARSE__ = safeParse;
+  window.__DAV_LS_GET__ = function(key, fallback){ return safeParse(localStorage.getItem(key), fallback); };
+  window.__DAV_LS_SET__ = function(key, value){
+    try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
+  };
+})();
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js?v=450').catch(function(){});
+  });
+}
+</script>
 
 </body></html>`;
 
@@ -17566,7 +17825,7 @@ function installOpenSchemaFallback(){
 })();
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw.js').catch(function(){});
+    navigator.serviceWorker.register('./sw.js?v=450').catch(function(){});
   });
 }
 </script>

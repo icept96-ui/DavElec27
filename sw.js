@@ -1,62 +1,74 @@
-/* DavElec PWA service worker (safe cache for GitHub Pages project site) */
-const CACHE_NAME = "davelec-v458" + "20260302";
-const CORE = [
-  "./",
-  "./index.html",
-  "./manifest.webmanifest",
-  "./icon-192.png",
-  "./icon-512.png"
+/* DavElec SW v460 (GitHub Pages safe) */
+const VERSION = 'v460';
+const CACHE = `davelec-${VERSION}`;
+const CORE_ASSETS = [
+  './',
+  './index.html',
+  './manifest.webmanifest',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE)).then(() => self.skipWaiting())
-  );
+// Install: pre-cache core (best-effort)
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+  event.waitUntil((async () => {
+    try{
+      const cache = await caches.open(CACHE);
+      await cache.addAll(CORE_ASSETS.map(u => new Request(u, {cache:'reload'})));
+    }catch(e){}
+  })());
 });
 
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.map((k) => (k.startsWith("davelec-") && k !== CACHE_NAME) ? caches.delete(k) : Promise.resolve()))
-    ).then(() => self.clients.claim())
-  );
+// Activate: cleanup old caches
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k.startsWith('davelec-') && k !== CACHE).map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
 });
 
-// Cache-first for same-origin static assets; network-first for navigation (HTML).
-self.addEventListener("fetch", (event) => {
+// Fetch strategy:
+// - For navigation (HTML): network-first, fallback to cache
+// - For static: cache-first, fallback to network
+self.addEventListener('fetch', (event) => {
   const req = event.request;
-  if (req.method !== "GET") return;
-
   const url = new URL(req.url);
 
-  // Only handle same-origin requests
+  // Only handle same-origin
   if (url.origin !== self.location.origin) return;
 
-  // Navigation requests: network first, fallback to cached shell
-  if (req.mode === "navigate" || (req.destination === "document")) {
-    event.respondWith(
-      fetch(req)
-        .then((resp) => {
-          const copy = resp.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put("./index.html", copy)).catch(()=>{});
-          return resp;
-        })
-        .catch(() => caches.match("./index.html"))
-    );
+  const isNav = (req.mode === 'navigate') || (req.destination === 'document');
+
+  if (isNav) {
+    event.respondWith((async () => {
+      try{
+        const fresh = await fetch(req, {cache:'no-store'});
+        const cache = await caches.open(CACHE);
+        cache.put('./index.html', fresh.clone()).catch(()=>{});
+        return fresh;
+      }catch(e){
+        const cached = await caches.match('./index.html');
+        return cached || new Response('Offline', {status: 503, headers:{'Content-Type':'text/plain'}});
+      }
+    })());
     return;
   }
 
-  // Static assets: cache first, but NEVER fall back to HTML for JS/CSS
-  event.respondWith(
-    caches.match(req).then((cached) => {
-      if (cached) return cached;
-      return fetch(req).then((resp) => {
-        // Don't cache opaque or error responses
-        if (!resp || resp.status >= 400) return resp;
-        const copy = resp.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(req, copy)).catch(()=>{});
-        return resp;
-      });
-    })
-  );
+  event.respondWith((async () => {
+    const cached = await caches.match(req);
+    if (cached) return cached;
+    try{
+      const fresh = await fetch(req);
+      // cache successful basic responses
+      if (fresh && fresh.ok && fresh.type === 'basic') {
+        const cache = await caches.open(CACHE);
+        cache.put(req, fresh.clone()).catch(()=>{});
+      }
+      return fresh;
+    }catch(e){
+      return cached || new Response('', {status: 504});
+    }
+  })());
 });
