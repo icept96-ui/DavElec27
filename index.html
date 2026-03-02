@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
-<title>DavElec — v455 (PWA GitHub Fix)</title>
+<title>DavElec — v451 (PWA Hotfix)</title>
 <script>
 /* v451 hotfix: remove corrupted storage values (HTML/404) that crash JSON.parse on Android/GitHub Pages */
 (function(){
@@ -1856,23 +1856,8 @@ window.addEventListener('DOMContentLoaded', ()=>{
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
-  <link rel="manifest" href="manifest.webmanifest">
-  <script>
-/* v455 bootstrap: guarantee storage helpers exist before any module uses them */
-(function(){
-  window.__DAV_LS_GET__ = window.__DAV_LS_GET__ || function(key, fallback){
-    try { const v = localStorage.getItem(key); return (v === null || v === undefined) ? fallback : v; }
-    catch(e){ return fallback; }
-  };
-  window.__DAV_LS_SET__ = window.__DAV_LS_SET__ || function(key, value){
-    try { localStorage.setItem(key, String(value)); return true; } catch(e){ return false; }
-  };
-  window.__DAV_SAFE_JSON__ = window.__DAV_SAFE_JSON__ || function(str, fallback){
-    try { return JSON.parse(str); } catch(e){ return fallback; }
-  };
-})();
-</script>
-<meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="./manifest.webmanifest?v=456">
+  <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
@@ -9614,7 +9599,7 @@ function quadro_export_pdf(){
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
-  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="manifest" href="./manifest.webmanifest?v=456">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -9812,7 +9797,7 @@ function quadro_export_pdf(){
 })();
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register("sw.js").catch(function(){});
+    navigator.serviceWorker.register('./sw_v456.js').catch(function(){});
   });
 }
 </script>
@@ -12341,7 +12326,7 @@ renderSavedBudgets();
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
-  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="manifest" href="./manifest.webmanifest?v=456">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12751,7 +12736,7 @@ renderSavedBudgets();
 })();
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register("sw.js").catch(function(){});
+    navigator.serviceWorker.register('./sw_v456.js').catch(function(){});
   });
 }
 </script>
@@ -17816,7 +17801,7 @@ function installOpenSchemaFallback(){
 })();
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register("sw.js").catch(function(){});
+    navigator.serviceWorker.register('./sw_v456.js').catch(function(){});
   });
 }
 </script>

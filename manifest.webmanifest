@@ -1,12 +1,11 @@
 {
   "name": "DavElec",
   "short_name": "DavElec",
-  "start_url": "./?v=455",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0b1020",
-  "theme_color": "#0b1020",
-  "description": "DavElec - Ferramentas para eletricistas (offline).",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
   "icons": [
     {
       "src": "./icon-192.png",
