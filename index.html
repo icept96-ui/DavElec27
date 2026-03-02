@@ -4,8 +4,9 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
-<title>DavElec — v451 (PWA Hotfix)</title>
+<title>DavElec — v454 (PWA Final Fix)</title>
 <script>
+window.DIAG_PROBLEMAS = window.DIAG_PROBLEMAS || [];
 /* v451 hotfix: remove corrupted storage values (HTML/404) that crash JSON.parse on Android/GitHub Pages */
 (function(){
   try{
@@ -6968,7 +6969,7 @@ async function pdfFromJpegs(jpegs, wPt, hPt) {
 
 
 /* ====== AVARIAS / DIAGNÓSTICO ====== */
-const DIAG_PROBLEMAS = [
+var DIAG_PROBLEMAS = [
 {
     id: "dj_desarma",
     t: "Disjuntor (DJ) desarma / vai abaixo",

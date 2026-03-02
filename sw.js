@@ -1,5 +1,5 @@
-/* DavElec Service Worker v452 */
-const CACHE_NAME = 'davelec-v452';
+/* DavElec Service Worker v454 */
+const CACHE_NAME = 'davelec-v454';
 const CORE = [
   './',
   './index.html',
