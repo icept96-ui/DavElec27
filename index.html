@@ -4,8 +4,65 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
-<title>DavElec — v451 (PWA Hotfix)</title>
+<title>DavElec — v458 (PWA GitHub Fix)</title>
 <script>
+
+/* v458: HARD FIX for GitHub Pages "Unexpected token '<'" caused by corrupted storage/404 HTML.
+   - sanitize ALL storage entries that look like HTML
+   - make JSON.parse resilient (returns null instead of throwing on invalid JSON)
+   - reset old service workers/caches from previous builds (one-time self-heal)
+*/
+(function(){
+  // Make JSON.parse resilient to corrupted values (HTML/404 etc.)
+  const __origParse = JSON.parse;
+  JSON.parse = function(text, reviver){
+    try{
+      if(typeof text === 'string'){
+        const t = text.replace(/^\uFEFF/, '').trimStart();
+        if(t.startsWith('<') || t.startsWith('<!--')) return null;
+      }
+      return __origParse.call(this, text, reviver);
+    }catch(e){
+      return null;
+    }
+  };
+
+  // Sanitize local/session storage: remove any value that looks like HTML (often 404 pages)
+  function sanitizeStorage(st){
+    try{
+      if(!st) return;
+      for(let i=st.length-1;i>=0;i--){
+        const k = st.key(i);
+        const v = st.getItem(k);
+        if(typeof v !== 'string') continue;
+        const t = v.replace(/^\uFEFF/, '').trimStart();
+        if(t.startsWith('<') || t.startsWith('<!--') || t.startsWith('<!DOCTYPE') || t.startsWith('<html')){
+          st.removeItem(k);
+        }
+      }
+    }catch(e){}
+  }
+  sanitizeStorage(localStorage);
+  sanitizeStorage(sessionStorage);
+
+  // One-time reset of old SW/caches that may serve wrong content for JS files
+  (async()=>{
+    try{
+      if(!('serviceWorker' in navigator)) return;
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for(const r of regs){
+        const url = (r && r.active && r.active.scriptURL) ? r.active.scriptURL : (r && r.installing && r.installing.scriptURL) ? r.installing.scriptURL : '';
+        if(url && !url.includes('sw_v458.js')){
+          await r.unregister();
+        }
+      }
+      if(window.caches && caches.keys){
+        const keys = await caches.keys();
+        await Promise.all(keys.filter(k=>/^davelec-/.test(k) && !/v458/.test(k)).map(k=>caches.delete(k)));
+      }
+    }catch(e){}
+  })();
+})();
 /* v451 hotfix: remove corrupted storage values (HTML/404) that crash JSON.parse on Android/GitHub Pages */
 (function(){
   try{
@@ -9797,7 +9854,7 @@ function quadro_export_pdf(){
 })();
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw_v456.js').catch(function(){});
+    navigator.serviceWorker.register('./sw_v458.js').catch(function(){});
   });
 }
 </script>
@@ -12736,7 +12793,7 @@ renderSavedBudgets();
 })();
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw_v456.js').catch(function(){});
+    navigator.serviceWorker.register('./sw_v458.js').catch(function(){});
   });
 }
 </script>
@@ -17801,7 +17858,7 @@ function installOpenSchemaFallback(){
 })();
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw_v456.js').catch(function(){});
+    navigator.serviceWorker.register('./sw_v458.js').catch(function(){});
   });
 }
 </script>
