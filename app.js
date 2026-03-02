@@ -1,73 +1,53 @@
-document.getElementById("btnStart").addEventListener("click",function(){
 
-document.getElementById("menu").classList.remove("hidden");
+function openTool(tool){
 
-});
+const c = document.getElementById("content")
 
-function calcPotencia(){
+if(tool==="secao"){
+c.innerHTML=`
+<h2>Cálculo Secção</h2>
 
-let v = prompt("Voltagem (V)");
-let i = prompt("Corrente (A)");
+<input id="pot" placeholder="Potência W">
+<input id="dist" placeholder="Distância m">
 
-v = parseFloat(v);
-i = parseFloat(i);
+<button onclick="calcSecao()">Calcular</button>
 
-if(isNaN(v)||isNaN(i)){
-
-alert("Valores inválidos");
-return;
-
+<div id="resultado"></div>
+`
 }
 
-let p = v*i;
+if(tool==="conversor"){
+c.innerHTML=`
+<h2>Conversor Watts → Amps</h2>
 
-document.getElementById("resultado").innerHTML =
-"Potência = "+p+" W";
+<input id="watts" placeholder="Watts">
 
+<button onclick="wattsToAmps()">Converter</button>
+
+<div id="resultado"></div>
+`
 }
 
-function calcCorrente(){
-
-let p = prompt("Potência (W)");
-let v = prompt("Voltagem (V)");
-
-p = parseFloat(p);
-v = parseFloat(v);
-
-if(isNaN(p)||isNaN(v)){
-
-alert("Valores inválidos");
-return;
-
+if(tool==="circuitos"){
+c.innerHTML=`
+<h2>Circuitos Habitação</h2>
+<button onclick="showCircuitos()">Mostrar tabela</button>
+<div id="resultado"></div>
+`
 }
 
-let i = p/v;
-
-document.getElementById("resultado").innerHTML =
-"Corrente = "+i.toFixed(2)+" A";
-
+if(tool==="quadro"){
+c.innerHTML=`
+<h2>Quadro Elétrico</h2>
+<p>Módulo em construção</p>
+`
 }
 
-function calcQueda(){
-
-let l = prompt("Comprimento cabo (m)");
-let i = prompt("Corrente (A)");
-let s = prompt("Secção cabo mm2");
-
-l=parseFloat(l);
-i=parseFloat(i);
-s=parseFloat(s);
-
-if(isNaN(l)||isNaN(i)||isNaN(s)){
-
-alert("Valores inválidos");
-return;
-
+if(tool==="orcamento"){
+c.innerHTML=`
+<h2>Orçamentos</h2>
+<p>Módulo em construção</p>
+`
 }
-
-let queda=(2*l*i*0.017)/s;
-
-document.getElementById("resultado").innerHTML=
-"Queda tensão = "+queda.toFixed(2)+" V";
 
 }

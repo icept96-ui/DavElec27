@@ -1,62 +1,43 @@
-body{
 
+body{
+margin:0;
+font-family:Arial;
 background:#0b1020;
 color:white;
-font-family:Arial;
-margin:0;
-text-align:center;
-
 }
 
-.container{
-
-max-width:500px;
+.app{
+max-width:900px;
 margin:auto;
-padding:40px;
-
+padding:20px;
 }
 
-h1{
-
-font-size:40px;
-margin-bottom:10px;
-
-}
-
-.sub{
-
-opacity:.7;
-margin-bottom:40px;
-
+.menu{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+margin-bottom:20px;
 }
 
 button{
-
-background:linear-gradient(45deg,#ffc400,#ff9800);
-border:none;
-padding:14px 25px;
-margin:10px;
+padding:12px;
 border-radius:10px;
+border:none;
+background:#1e88e5;
+color:white;
 font-size:16px;
-cursor:pointer;
-
 }
 
-button:hover{
-
-opacity:.9;
-
+input{
+padding:10px;
+margin:5px 0;
+width:100%;
+border-radius:8px;
+border:none;
 }
 
-.hidden{
-
-display:none;
-
-}
-
-#resultado{
-
-margin-top:20px;
-font-size:18px;
-
+#content{
+background:#11182c;
+padding:20px;
+border-radius:10px;
 }
