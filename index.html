@@ -4,48 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
-<title>DavElec — v451 (PWA Hotfix)</title>
-<script>
-
-/* ===== DavElec GitHub/PWA bootstrap (v460) ===== */
-(function(){
-  // localStorage safe helpers (some modules expect these globals)
-  if (!window.__DAV_LS_GET__) {
-    window.__DAV_LS_GET__ = function(key, fallback){
-      try{
-        const v = localStorage.getItem(key);
-        return v===null ? fallback : JSON.parse(v);
-      }catch(e){ return fallback; }
-    };
-  }
-  if (!window.__DAV_LS_SET__) {
-    window.__DAV_LS_SET__ = function(key, value){
-      try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
-    };
-  }
-  // Avoid "Cannot access DIAG_* before initialization" across cached/old code paths
-  if (typeof window.DIAG_CAT === 'undefined') window.DIAG_CAT = 'ALL';
-  if (typeof window.DIAG_PROBLEMAS === 'undefined') window.DIAG_PROBLEMAS = [];
-})();
-
-/* v451 hotfix: remove corrupted storage values (HTML/404) that crash JSON.parse on Android/GitHub Pages */
-(function(){
-  try{
-    const storages = [localStorage, sessionStorage];
-    storages.forEach((st)=>{
-      if(!st) return;
-      for(let i=st.length-1;i>=0;i--){
-        const k = st.key(i);
-        const v = st.getItem(k);
-        if(typeof v === "string" && v.trim().startsWith("<")){
-          st.removeItem(k);
-        }
-      }
-    });
-  }catch(e){}
-})();
-</script>
-
+<title>DavElec — v439 (Obras Anexos + ZIP)</title>
 <style>
 /* ========== VARIÁVEIS E BASE ========== */
 :root{
@@ -1878,14 +1837,26 @@ window.addEventListener('DOMContentLoaded', ()=>{
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
-  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta http-equiv="Cache-Control" content="no-store, max-age=0">
-<meta http-equiv="Pragma" content="no-cache">
+
+<!-- ===== DavElec PWA bootstrap (GitHub Pages safe) ===== -->
+<link id="pwa-manifest" rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#0b1020">
+<link id="pwa-icon-192" rel="icon" sizes="192x192" href="./icon-192.png">
+<link id="pwa-icon-512" rel="icon" sizes="512x512" href="./icon-512.png">
+<link id="pwa-apple" rel="apple-touch-icon" href="./icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="./pwa-register.js" defer></script>
+<!-- ================================================ -->
+
 </head>
 <body>
+<div id=\"dav-splash\" aria-hidden=\"true\"></div>
+
 
 <!-- ========== SPLASH ========== -->
 <section aria-label="Ecrã inicial" id="welcome">
@@ -6992,7 +6963,7 @@ async function pdfFromJpegs(jpegs, wPt, hPt) {
 
 
 /* ====== AVARIAS / DIAGNÓSTICO ====== */
-var DIAG_PROBLEMAS = (window.DIAG_PROBLEMAS = [
+const DIAG_PROBLEMAS = [
 {
     id: "dj_desarma",
     t: "Disjuntor (DJ) desarma / vai abaixo",
@@ -8677,10 +8648,10 @@ var DIAG_PROBLEMAS = (window.DIAG_PROBLEMAS = [
     }
 
 
-]);
+];
 
 
-var DIAG_CAT = (window.DIAG_CAT = 'ALL');
+let DIAG_CAT = 'ALL';
 
 function diag_setCat(cat){
   DIAG_CAT = cat || 'ALL';
@@ -9623,7 +9594,7 @@ function quadro_export_pdf(){
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
-  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -9819,10 +9790,11 @@ function quadro_export_pdf(){
     try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
   };
 })();
+/* PWA SW registration moved to pwa-register.js */
 );
   });
 }
-<\/script>
+</script>
 
 </body>
 </html>`;
@@ -12348,7 +12320,7 @@ renderSavedBudgets();
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
-  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12756,6 +12728,7 @@ renderSavedBudgets();
     try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
   };
 })();
+/* PWA SW registration moved to pwa-register.js */
 );
   });
 }
@@ -17819,6 +17792,7 @@ function installOpenSchemaFallback(){
     try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
   };
 })();
+/* PWA SW registration moved to pwa-register.js */
 );
   });
 }
