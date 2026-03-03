@@ -4,35 +4,6 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
-
-<script>
-/* DavElec PWA/GitHub bootstrap (v606) - safe base paths + SW */
-(function(){
-  try{
-    var parts = (location.pathname || "/").split("/").filter(Boolean);
-    // For GitHub project pages: https://user.github.io/REPO/... -> base "/REPO/"
-    var repo = (parts.length>0) ? parts[0] : "";
-    window.__DAV_BASE = repo ? ("/" + repo + "/") : "/";
-  }catch(e){ window.__DAV_BASE = "/"; }
-  // Inject manifest + icons using absolute path so it works with/without trailing slash
-  try{
-    var head = document.head || document.getElementsByTagName("head")[0];
-    function add(tag, attrs){
-      var el = document.createElement(tag);
-      for(var k in attrs){ el.setAttribute(k, attrs[k]); }
-      head.appendChild(el);
-      return el;
-    }
-    add("link",{rel:"manifest", href: window.__DAV_BASE + "manifest.webmanifest"});
-    add("meta",{name:"theme-color", content:"#0b1020"});
-    add("link",{rel:"icon", sizes:"192x192", href: window.__DAV_BASE + "icon-192.png"});
-    add("link",{rel:"icon", sizes:"512x512", href: window.__DAV_BASE + "icon-512.png"});
-    add("link",{rel:"icon", sizes:"192x192", href: window.__DAV_BASE + "icon-192-maskable.png"});
-    add("link",{rel:"icon", sizes:"512x512", href: window.__DAV_BASE + "icon-512-maskable.png"});
-    add("link",{rel:"apple-touch-icon", href: window.__DAV_BASE + "icon-192.png"});
-  }catch(e){}
-})();
-</script>
 <title>DavElec — v439 (Obras Anexos + ZIP)</title>
 <style>
 /* ========== VARIÁVEIS E BASE ========== */
@@ -1867,9 +1838,20 @@ window.addEventListener('DOMContentLoaded', ()=>{
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
 
-  <meta name="theme-color" content="#0f172a">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+
+<meta name="theme-color" content="#0b1020">
+
+<style>
+#davelec_splash{position:fixed;inset:0;background:#0b1020;display:flex;align-items:center;justify-content:center;z-index:999999;transition:opacity .25s ease}
+#davelec_splash.hide{opacity:0;pointer-events:none}
+#davelec_splash .wrap{display:flex;flex-direction:column;align-items:center;gap:14px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#fff}
+#davelec_splash .logo{width:92px;height:92px;border-radius:22px;background:linear-gradient(145deg,#102044,#0b1020);display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.06)}
+#davelec_splash .title{font-weight:800;font-size:22px;letter-spacing:.3px}
+#davelec_splash .sub{opacity:.7;font-size:13px}
+@media (prefers-reduced-motion: reduce){#davelec_splash{transition:none}}
+</style>
+
 </head>
 <body>
 
@@ -5451,7 +5433,7 @@ function limparCircuitos(){
 }
 
 /* ===================== OBRAS + LOCALSTORAGE ===================== */
-let obras=__DAV_LS_GET__('davelec_obras', []);
+let obras=JSON.parse(localStorage.getItem('davelec_obras')||'[]');
 
 let obraAtual=null;
 let fotos=[];
@@ -9610,9 +9592,18 @@ function quadro_export_pdf(){
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
 
-  <meta name="theme-color" content="#0f172a">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0b1020">
+
+<style>
+#davelec_splash{position:fixed;inset:0;background:#0b1020;display:flex;align-items:center;justify-content:center;z-index:999999;transition:opacity .25s ease}
+#davelec_splash.hide{opacity:0;pointer-events:none}
+#davelec_splash .wrap{display:flex;flex-direction:column;align-items:center;gap:14px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#fff}
+#davelec_splash .logo{width:92px;height:92px;border-radius:22px;background:linear-gradient(145deg,#102044,#0b1020);display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.06)}
+#davelec_splash .title{font-weight:800;font-size:22px;letter-spacing:.3px}
+#davelec_splash .sub{opacity:.7;font-size:13px}
+@media (prefers-reduced-motion: reduce){#davelec_splash{transition:none}}
+</style>
+
 </head>
 <body>
   <div class="hdr">
@@ -9787,31 +9778,6 @@ function quadro_export_pdf(){
 
 })();
 <\/script>
-
-<script>
-/* PWA + Safe storage parse (Android/WebView friendly) */
-(function(){
-  function safeParse(str, fallback){
-    try{
-      if(str === null || str === undefined || str === "") return fallback;
-      return JSON.parse(str);
-    }catch(e){
-      return fallback;
-    }
-  }
-  window.__DAV_SAFE_PARSE__ = safeParse;
-  window.__DAV_LS_GET__ = function(key, fallback){ return safeParse(localStorage.getItem(key), fallback); };
-  window.__DAV_LS_SET__ = function(key, value){
-    try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
-  };
-})();
-if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    (window.__DAV_SW_REG_DONE?Promise.resolve(): (window.__DAV_SW_REG_DONE=true, navigator.serviceWorker.register(__DAV_BASE + 'sw.js', { scope: __DAV_BASE }))).catch(function(){});
-  });
-}
-</script>
-
 </body>
 </html>`;
 
@@ -10568,7 +10534,7 @@ function conv_copy(){
     function getAllCatalogItems(){
       // base + personalizados
       let custom = [];
-      try{ custom = __DAV_LS_GET__('davelec_orc_catalog_custom', []) || []; }catch(_){ custom=[]; }
+      try{ custom = JSON.parse(localStorage.getItem('davelec_orc_catalog_custom')||'[]') || []; }catch(_){ custom=[]; }
       // normalizar
       custom = (Array.isArray(custom)?custom:[]).map((x,i)=>({
         id: x.id || ('cust_'+i),
@@ -10757,7 +10723,7 @@ function buildCatalog(){
       if(!mgr || !listEl) return;
 
       function loadCustom(){
-        try{ return __DAV_LS_GET__('davelec_orc_catalog_custom', []) || []; }catch(_){ return []; }
+        try{ return JSON.parse(localStorage.getItem('davelec_orc_catalog_custom')||'[]') || []; }catch(_){ return []; }
       }
       function saveCustom(arr){
         try{ localStorage.setItem('davelec_orc_catalog_custom', JSON.stringify(arr||[])); }catch(_){}
@@ -12337,9 +12303,18 @@ renderSavedBudgets();
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
 
-  <meta name="theme-color" content="#0f172a">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0b1020">
+
+<style>
+#davelec_splash{position:fixed;inset:0;background:#0b1020;display:flex;align-items:center;justify-content:center;z-index:999999;transition:opacity .25s ease}
+#davelec_splash.hide{opacity:0;pointer-events:none}
+#davelec_splash .wrap{display:flex;flex-direction:column;align-items:center;gap:14px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#fff}
+#davelec_splash .logo{width:92px;height:92px;border-radius:22px;background:linear-gradient(145deg,#102044,#0b1020);display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.06)}
+#davelec_splash .title{font-weight:800;font-size:22px;letter-spacing:.3px}
+#davelec_splash .sub{opacity:.7;font-size:13px}
+@media (prefers-reduced-motion: reduce){#davelec_splash{transition:none}}
+</style>
+
 </head>
 <body>
   <div class="wrap"><div class="sheet">
@@ -12726,31 +12701,6 @@ renderSavedBudgets();
 
 })();
 <\/script>
-
-<script>
-/* PWA + Safe storage parse (Android/WebView friendly) */
-(function(){
-  function safeParse(str, fallback){
-    try{
-      if(str === null || str === undefined || str === "") return fallback;
-      return JSON.parse(str);
-    }catch(e){
-      return fallback;
-    }
-  }
-  window.__DAV_SAFE_PARSE__ = safeParse;
-  window.__DAV_LS_GET__ = function(key, fallback){ return safeParse(localStorage.getItem(key), fallback); };
-  window.__DAV_LS_SET__ = function(key, value){
-    try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
-  };
-})();
-if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    (window.__DAV_SW_REG_DONE?Promise.resolve(): (window.__DAV_SW_REG_DONE=true, navigator.serviceWorker.register(__DAV_BASE + 'sw.js', { scope: __DAV_BASE }))).catch(function(){});
-  });
-}
-</script>
-
 </body></html>`;
 
       const w = window.open("", "_blank");
@@ -17793,27 +17743,29 @@ function installOpenSchemaFallback(){
 
 
 <script>
-/* PWA + Safe storage parse (Android/WebView friendly) */
-(function(){
-  function safeParse(str, fallback){
-    try{
-      if(str === null || str === undefined || str === "") return fallback;
-      return JSON.parse(str);
-    }catch(e){
-      return fallback;
-    }
-  }
-  window.__DAV_SAFE_PARSE__ = safeParse;
-  window.__DAV_LS_GET__ = function(key, fallback){ return safeParse(localStorage.getItem(key), fallback); };
-  window.__DAV_LS_SET__ = function(key, value){
-    try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
-  };
-})();
-if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    (window.__DAV_SW_REG_DONE?Promise.resolve(): (window.__DAV_SW_REG_DONE=true, navigator.serviceWorker.register(__DAV_BASE + 'sw.js', { scope: __DAV_BASE }))).catch(function(){});
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(function(){ });
   });
 }
+</script>
+
+
+<script>
+(function(){
+  function hideSplash(){
+    var el=document.getElementById("davelec_splash");
+    if(!el) return;
+    el.classList.add("hide");
+    setTimeout(function(){ try{ el.remove(); }catch(e){} }, 350);
+  }
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    setTimeout(hideSplash, 250);
+  } else {
+    document.addEventListener("DOMContentLoaded", function(){ setTimeout(hideSplash, 250); });
+  }
+  window.addEventListener("load", function(){ setTimeout(hideSplash, 250); });
+})();
 </script>
 
 </body>
