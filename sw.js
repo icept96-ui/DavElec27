@@ -1,11 +1,7 @@
-
-/* DavElec minimal SW (GitHub Pages safe) */
-self.addEventListener('install', (event) => {
-  self.skipWaiting();
-});
+/* DavElec SW (safe, simple) */
+self.addEventListener('install', (event) => { self.skipWaiting(); });
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
-    // Clean old caches from previous experiments
     try {
       const keys = await caches.keys();
       await Promise.all(keys.map(k => caches.delete(k)));
@@ -14,6 +10,6 @@ self.addEventListener('activate', (event) => {
   })());
 });
 self.addEventListener('fetch', (event) => {
-  // Pure network pass-through (no caching logic = fewer edge cases)
+  // network pass-through; avoids caching mismatches causing HTML returned as JS
   event.respondWith(fetch(event.request));
 });
