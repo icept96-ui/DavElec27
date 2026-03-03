@@ -1839,6 +1839,19 @@ window.addEventListener('DOMContentLoaded', ()=>{
 </style>
 
 <link rel="manifest" href="manifest.webmanifest">
+
+<meta name="theme-color" content="#0b1020">
+
+<style>
+#davelec_splash{position:fixed;inset:0;background:#0b1020;display:flex;align-items:center;justify-content:center;z-index:999999;transition:opacity .25s ease}
+#davelec_splash.hide{opacity:0;pointer-events:none}
+#davelec_splash .wrap{display:flex;flex-direction:column;align-items:center;gap:14px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#fff}
+#davelec_splash .logo{width:92px;height:92px;border-radius:22px;background:linear-gradient(145deg,#102044,#0b1020);display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.06)}
+#davelec_splash .title{font-weight:800;font-size:22px;letter-spacing:.3px}
+#davelec_splash .sub{opacity:.7;font-size:13px}
+@media (prefers-reduced-motion: reduce){#davelec_splash{transition:none}}
+</style>
+
 </head>
 <body>
 
@@ -9578,6 +9591,19 @@ function quadro_export_pdf(){
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
+
+<meta name="theme-color" content="#0b1020">
+
+<style>
+#davelec_splash{position:fixed;inset:0;background:#0b1020;display:flex;align-items:center;justify-content:center;z-index:999999;transition:opacity .25s ease}
+#davelec_splash.hide{opacity:0;pointer-events:none}
+#davelec_splash .wrap{display:flex;flex-direction:column;align-items:center;gap:14px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#fff}
+#davelec_splash .logo{width:92px;height:92px;border-radius:22px;background:linear-gradient(145deg,#102044,#0b1020);display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.06)}
+#davelec_splash .title{font-weight:800;font-size:22px;letter-spacing:.3px}
+#davelec_splash .sub{opacity:.7;font-size:13px}
+@media (prefers-reduced-motion: reduce){#davelec_splash{transition:none}}
+</style>
+
 </head>
 <body>
   <div class="hdr">
@@ -12276,6 +12302,19 @@ renderSavedBudgets();
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
+
+<meta name="theme-color" content="#0b1020">
+
+<style>
+#davelec_splash{position:fixed;inset:0;background:#0b1020;display:flex;align-items:center;justify-content:center;z-index:999999;transition:opacity .25s ease}
+#davelec_splash.hide{opacity:0;pointer-events:none}
+#davelec_splash .wrap{display:flex;flex-direction:column;align-items:center;gap:14px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#fff}
+#davelec_splash .logo{width:92px;height:92px;border-radius:22px;background:linear-gradient(145deg,#102044,#0b1020);display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.06)}
+#davelec_splash .title{font-weight:800;font-size:22px;letter-spacing:.3px}
+#davelec_splash .sub{opacity:.7;font-size:13px}
+@media (prefers-reduced-motion: reduce){#davelec_splash{transition:none}}
+</style>
+
 </head>
 <body>
   <div class="wrap"><div class="sheet">
@@ -17704,12 +17743,29 @@ function installOpenSchemaFallback(){
 
 
 <script>
-// DavElec PWA register (safe)
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
     navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(function(){ });
   });
 }
+</script>
+
+
+<script>
+(function(){
+  function hideSplash(){
+    var el=document.getElementById("davelec_splash");
+    if(!el) return;
+    el.classList.add("hide");
+    setTimeout(function(){ try{ el.remove(); }catch(e){} }, 350);
+  }
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    setTimeout(hideSplash, 250);
+  } else {
+    document.addEventListener("DOMContentLoaded", function(){ setTimeout(hideSplash, 250); });
+  }
+  window.addEventListener("load", function(){ setTimeout(hideSplash, 250); });
+})();
 </script>
 
 </body>
