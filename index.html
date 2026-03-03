@@ -17708,13 +17708,27 @@ function installOpenSchemaFallback(){
 
 <script>
 (function(){
+  // Compute repo base path for GitHub Pages: https://<user>.github.io/<repo>/...
+  var parts = location.pathname.split("/").filter(Boolean);
+  var base = "/";
+  if (location.host.endsWith(".github.io") && parts.length >= 1) {
+    base = "/" + parts[0] + "/";
+  } else {
+    // non-github hosting: use current directory
+    base = location.pathname.replace(/[^\/]*$/, "");
+  }
+  // Ensure we are on trailing slash for directory
   if (!location.pathname.endsWith("/")) {
-    location.replace(location.pathname + "/" + location.search + location.hash);
+    location.replace(base + location.search + location.hash);
     return;
   }
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function(){
-      navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(function(){});
+      var swUrl = base + "sw.js";
+      navigator.serviceWorker.register(swUrl, { scope: base }).catch(function(e){
+        // swallow errors to avoid breaking the app
+        console.warn("SW register failed", e);
+      });
     });
   }
 })();
