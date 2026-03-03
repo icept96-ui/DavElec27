@@ -1454,6 +1454,17 @@ details.fold .foldBody{ padding:12px; border-top:1px solid rgba(255,255,255,.08)
 #esquemas .legend .k{font-weight:900}
 #esquemas .legend .v{opacity:.9;line-height:1.35}
 
+
+/* ===== Esquemas técnicos (PT) ===== */
+.sch-grid{display:grid;grid-template-columns:1fr;gap:14px;}
+.sch-card{padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03);}
+.sch-card h3{margin:0 0 10px 0;font-size:20px;font-weight:900;}
+.sch-wrap{width:100%;overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.18);}
+.sch-svg{display:block;width:100%;min-width:560px;height:auto;}
+@media (max-width:520px){.sch-svg{min-width:640px;}}
+/* Halo no texto dentro do SVG (melhor leitura em cima dos fios) */
+.sch-svg text{paint-order:stroke;stroke:rgba(0,0,0,.55);stroke-width:4px;}
+
 </style>
 <script>
   // DavElec Stable Base
@@ -2070,7 +2081,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
       <b>Entrada</b>
       <div class="small"></div>
     </div>
-    <div class="hr"></div>
+    <div class="hr"></div>iv>
 
     <label>Tipo de conversão</label>
     <select id="conv_type" class="selectModern" onchange="conv_render()">
@@ -2398,9 +2409,13 @@ window.addEventListener('DOMContentLoaded', ()=>{
 <div class="card">
   <div class="row" style="gap:8px;flex-wrap:wrap">
     <button class="btn" onclick="Esq.open('int_simples')">🔌 Interruptor simples</button>
-    <button class="btn ghost" disabled title="Em breve">🔁 Vaivém</button>
-    <button class="btn ghost" disabled title="Em breve">🔀 Cruzamento</button>
-    <button class="btn ghost" disabled title="Em breve">⏱️ Teleruptor</button>
+    <button class="btn" onclick="Esq.open('vaivem')">🔁 Vaivém (2 pontos)</button>
+    <button class="btn" onclick="Esq.open('cruzamento')">🔀 Cruzamento (3+ pontos)</button>
+    <button class="btn" onclick="Esq.open('teleruptor')">⏱️ Teleruptor (botoeiras)</button>
+    <button class="btn" onclick="Esq.open('minuterie')">🕒 Minuteria escadas</button>
+    <button class="btn" onclick="Esq.open('sensor')">👁️ Sensor movimento</button>
+    <button class="btn" onclick="Esq.open('tomada')">🔌 Tomada 230V</button>
+    <button class="btn" onclick="Esq.open('campainha')">🔔 Campainha 12V</button>
   </div>
   <div class="hr"></div>
   <div class="small">Dica: toca no esquema para ampliar (zoom do navegador).</div>
@@ -13045,7 +13060,7 @@ el.qtd = $("orcQtd");
     const L = (x1,y1,x2,y2,stroke=COLORS.R,sw=5,dash="")=>{
       const da = dash ? ` stroke-dasharray="${dash}"` : "";
       const d = elbow(x1,y1,x2,y2);
-      return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"${da} />`;
+      return `<path class="sch-wirepath" d="${d}" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"${da} />`;
     };
     const A = (x1,y1,x2,y2,stroke=COLORS.R,sw=5,dash="")=>{
       // Mantém o nome A por compatibilidade, mas sem setas (as setas estavam a poluir o desenho)
@@ -13102,14 +13117,14 @@ el.qtd = $("orcQtd");
       );
     };
 
-    let out = `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(title)}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;display:block;">`;
+    let out = `<div class="sch-wrap"><svg class="sch-svg" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(title)}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;display:block;">`;
     out += ``;
     out += `<rect x="16" y="16" width="${w-32}" height="${h-32}" rx="16" ry="16" fill="rgba(255,255,255,.04)" stroke="${COLORS.K}" stroke-width="2"/>`;
     out += T(30,46,title,18,0.95,900);
     out += topBuses();
     out += draw({L,A,P,R,T,Dot,COLORS,esc,svgEl,w,h});
     out += legend();
-    out += `</svg>`;
+    out += `</svg></div>`;
     return out;
   }
 
@@ -13470,7 +13485,7 @@ d.push(W([[bN[0],bN[1]],[so.p.N[0],bN[1]],[so.p.N[0],so.p.N[1]]], COLORS.N,5));
 
   const SCHEMAS = [
     {
-      id:"sch_simple_light",
+      id:"int_simples",
       cat:"Iluminação",
       title:"Interruptor simples (1 ponto de luz)",
       tags:["habitação","1 ponto"],
@@ -13486,7 +13501,305 @@ d.push(W([[bN[0],bN[1]],[so.p.N[0],bN[1]],[so.p.N[0],so.p.N[1]]], COLORS.N,5));
         {nome:"Caixa de aparelhagem", qtd:1, unid:"un"}
       ],
       svg:()=>schSvgBox("Interruptor simples — multifilar (prático)",({L,A,R,T,Dot,COLORS})=>{
-        const d = [];
+        const d = [
+  ,{
+    id:"vaivem",
+    cat:"Iluminação",
+    title:"Vaivém (2 pontos) — 2 interruptores, 1 luz",
+    desc:"Comando de um ponto de luz por 2 locais (corredor, quarto).",
+    tags:["vaivém","2 pontos","iluminação"],
+    svg: ()=> `
+      <div class="sch-grid">
+        <div class="sch-card">
+          <h3>1) Esquema elétrico funcional</h3>
+          ${schSvgBox("Vaivém — multifilar (prático)", ({Box,Dot,L,A,Text,Title,COLORS})=>{
+            const d=[];
+            d.push(Box(20,60,170,220,"Quadro / Alimentação","Saída iluminação"));
+            d.push(Box(220,60,140,150,"Interruptor 1","Comum + 2 viajantes"));
+            d.push(Box(220,230,140,150,"Interruptor 2","Comum + 2 viajantes"));
+            d.push(Box(400,120,140,180,"Ponto de luz","Lâmpada"));
+            // pontos
+            d.push(Dot(45,95,COLORS.L,"L (Fase)"));
+            d.push(Dot(45,140,COLORS.N,"N (Neutro)"));
+            d.push(Dot(45,185,COLORS.PE,"PE (Terra)"));
+            d.push(Dot(240,105,COLORS.L,"Comum"));
+            d.push(Dot(240,140,COLORS.T,"Viajante 1"));
+            d.push(Dot(240,175,COLORS.T,"Viajante 2"));
+            d.push(Dot(240,275,COLORS.L,"Comum"));
+            d.push(Dot(240,310,COLORS.T,"Viajante 1"));
+            d.push(Dot(240,345,COLORS.T,"Viajante 2"));
+            d.push(Dot(420,185,COLORS.L,"Retorno (L')"));
+            d.push(Dot(420,230,COLORS.N,"N"));
+            d.push(Dot(420,275,COLORS.PE,"PE"));
+            // ligações
+            d.push(A(70,95,220,105,COLORS.L));                // fase -> comum int1
+            d.push(A(260,140,260,310,COLORS.T));              // viajante 1
+            d.push(A(260,175,260,345,COLORS.T,true));             // viajante 2
+            d.push(A(280,275,400,185,COLORS.L));              // comum int2 -> retorno
+            d.push(A(70,140,400,230,COLORS.N));               // neutro -> lâmpada
+            d.push(A(70,185,400,275,COLORS.PE));              // terra -> ponto luz
+            return d.join("");
+          })}
+        </div>
+
+        <div class="sch-card">
+          <h3>2) Ligação real (caixas)</h3>
+          ${schSvgBox("Vaivém — caixas (obra)", ({Box,Dot,L,A,Text,Title,COLORS})=>{
+            const d=[];
+            d.push(Box(40,90,170,190,"Caixa de derivação","Entradas/saídas"));
+            d.push(Box(250,70,130,120,"Caixa aparelhagem","Interruptor 1"));
+            d.push(Box(250,230,130,120,"Caixa aparelhagem","Interruptor 2"));
+            d.push(Box(420,140,120,130,"Ponto de luz","Lâmpada"));
+            // pontos na derivação
+            d.push(Dot(65,125,COLORS.L,"L"));
+            d.push(Dot(65,155,COLORS.N,"N"));
+            d.push(Dot(65,185,COLORS.PE,"PE"));
+            d.push(Dot(65,225,COLORS.T,"V1"));
+            d.push(Dot(65,255,COLORS.T,"V2"));
+            d.push(Dot(65,285,COLORS.L,"Ret"));
+            // ligações
+            d.push(A(90,125,250,110,COLORS.L));
+            d.push(A(90,225,250,140,COLORS.T));
+            d.push(A(90,255,250,170,COLORS.T));
+            d.push(A(250,290,90,285,COLORS.L));
+            d.push(A(90,155,420,190,COLORS.N));
+            d.push(A(90,185,420,230,COLORS.PE));
+            d.push(A(315,190,315,260,COLORS.T));
+            d.push(A(335,210,335,280,COLORS.T));
+            d.push(A(355,230,355,300,COLORS.L));
+            d.push(Text(258,118,"Comum / V1 / V2","fill:rgba(255,255,255,.75);font-weight:700;font-size:12px"));
+            d.push(Text(258,278,"Comum / V1 / V2","fill:rgba(255,255,255,.75);font-weight:700;font-size:12px"));
+            return d.join("");
+          })}
+        </div>
+
+        <div class="row" style="gap:12px">
+          <div class="card"><h3>Cabo</h3><div class="small">3×1,5 mm² (L/N/PE) + viajantes entre os 2 interruptores (2 cond.) + retorno.</div></div>
+          <div class="card"><h3>Proteção</h3><div class="small">DJ C10 (iluminação) + ID 30 mA (tipo AC/A conforme cargas).</div></div>
+        </div>
+      </div>`
+  },
+  {
+    id:"cruzamento",
+    cat:"Iluminação",
+    title:"Cruzamento (3+ pontos) — 2 vaivém + 1 cruzamento",
+    desc:"Comando de um ponto de luz por 3 ou mais locais (corredores longos).",
+    tags:["cruzamento","3 pontos","iluminação"],
+    svg: ()=> `
+      <div class="sch-grid">
+        <div class="sch-card">
+          <h3>1) Esquema elétrico funcional</h3>
+          ${schSvgBox("Cruzamento — multifilar (prático)", ({Box,Dot,L,A,Text,Title,COLORS})=>{
+            const d=[];
+            d.push(Box(20,70,170,210,"Quadro / Alimentação","Saída iluminação"));
+            d.push(Box(215,70,125,125,"Vaivém 1","Comum + V1/V2"));
+            d.push(Box(215,220,125,125,"Cruzamento","4 terminais"));
+            d.push(Box(360,70,125,125,"Vaivém 2","Comum + V1/V2"));
+            d.push(Box(445,165,95,115,"Luz","Lâmpada"));
+            // pontos
+            d.push(Dot(45,105,COLORS.L,"L"));
+            d.push(Dot(45,145,COLORS.N,"N"));
+            d.push(Dot(45,185,COLORS.PE,"PE"));
+            d.push(Dot(235,105,COLORS.L,"Comum"));
+            d.push(Dot(235,140,COLORS.T,"V1"));
+            d.push(Dot(235,170,COLORS.T,"V2"));
+            d.push(Dot(235,255,COLORS.T,"P1"));
+            d.push(Dot(235,290,COLORS.T,"P2"));
+            d.push(Dot(380,105,COLORS.L,"Comum"));
+            d.push(Dot(380,140,COLORS.T,"V1"));
+            d.push(Dot(380,170,COLORS.T,"V2"));
+            d.push(Dot(460,205,COLORS.L,"Ret"));
+            d.push(Dot(460,235,COLORS.N,"N"));
+            d.push(Dot(460,265,COLORS.PE,"PE"));
+            // ligações
+            d.push(A(70,105,215,105,COLORS.L));          // L -> comum V1
+            d.push(A(255,140,215,255,COLORS.T));         // V1 -> cruz
+            d.push(A(255,170,215,290,COLORS.T,true));        // V2 -> cruz
+            d.push(A(340,255,360,140,COLORS.T));         // cruz -> V1 vaivem2
+            d.push(A(340,290,360,170,COLORS.T,true));        // cruz -> V2 vaivem2
+            d.push(A(405,105,445,205,COLORS.L));         // comum vaivem2 -> retorno
+            d.push(A(70,145,445,235,COLORS.N));          // N -> lâmpada
+            d.push(A(70,185,445,265,COLORS.PE));         // PE -> lâmpada
+            return d.join("");
+          })}
+        </div>
+
+        <div class="row" style="gap:12px">
+          <div class="card"><h3>Cabo</h3><div class="small">Entre vaivém↔cruzamento↔vaivém: 2 viajantes (por trecho) + comuns/retorno conforme traçado. Planear bem antes de fechar.</div></div>
+          <div class="card"><h3>Proteção</h3><div class="small">DJ C10 (iluminação) + ID 30 mA.</div></div>
+        </div>
+      </div>`
+  },
+  {
+    id:"teleruptor",
+    cat:"Iluminação",
+    title:"Teleruptor — várias botoeiras, 1 luz",
+    desc:"Comando por impulsos (botoeiras) para um circuito de iluminação.",
+    tags:["teleruptor","botoeiras","iluminação"],
+    svg: ()=> `
+      <div class="sch-grid">
+        <div class="sch-card">
+          <h3>Esquema funcional (com bobine)</h3>
+          ${schSvgBox("Teleruptor — princípio", ({Box,Dot,L,A,Text,Title,COLORS})=>{
+            const d=[];
+            d.push(Box(20,70,170,220,"Quadro","DJ + ID + Teleruptor"));
+            d.push(Box(220,80,150,120,"Botoeiras","em paralelo"));
+            d.push(Box(220,230,150,120,"Bobine (A1/A2)","teleruptor"));
+            d.push(Box(410,140,130,160,"Ponto de luz","Lâmpada"));
+            d.push(Dot(45,105,COLORS.L,"L"));
+            d.push(Dot(45,145,COLORS.N,"N"));
+            d.push(Dot(240,125,COLORS.L,"Impulso"));
+            d.push(Dot(240,270,COLORS.L,"A1"));
+            d.push(Dot(240,305,COLORS.N,"A2 (N)"));
+            d.push(Dot(430,200,COLORS.L,"L' (saída)"));
+            d.push(Dot(430,240,COLORS.N,"N"));
+            // ligações
+            d.push(A(70,105,220,125,COLORS.L));
+            d.push(A(370,125,220,270,COLORS.L));
+            d.push(A(70,145,220,305,COLORS.N));
+            d.push(A(70,105,410,200,COLORS.L));
+            d.push(A(330,270,410,200,COLORS.L));
+            d.push(A(70,145,410,240,COLORS.N));
+            return d.join("");
+          })}
+        </div>
+
+        <div class="row" style="gap:12px">
+          <div class="card"><h3>Nota</h3><div class="small">As botoeiras ligam em paralelo para enviar impulso à bobine. O contacto do teleruptor alimenta o retorno da lâmpada.</div></div>
+          <div class="card"><h3>Proteção</h3><div class="small">DJ C10 (iluminação) + ID 30 mA. Teleruptor conforme corrente.</div></div>
+        </div>
+      </div>`
+  },
+  {
+    id:"minuterie",
+    cat:"Iluminação",
+    title:"Minuteria escadas — temporizador",
+    desc:"Liga a luz por tempo após impulso (escadas, garagens).",
+    tags:["minuteria","escadas","temporizador"],
+    svg: ()=> `
+      <div class="sch-grid">
+        <div class="sch-card">
+          <h3>Esquema funcional</h3>
+          ${schSvgBox("Minuteria — princípio", ({Box,Dot,L,A,Text,Title,COLORS})=>{
+            const d=[];
+            d.push(Box(20,70,180,220,"Quadro","DJ + ID + Minuteria"));
+            d.push(Box(230,90,150,110,"Botoeiras","em paralelo"));
+            d.push(Box(430,140,110,160,"Luz","Lâmpada"));
+            d.push(Dot(45,105,COLORS.L,"L"));
+            d.push(Dot(45,145,COLORS.N,"N"));
+            d.push(Dot(250,135,COLORS.L,"Impulso"));
+            d.push(Dot(450,200,COLORS.L,"L' (saída)"));
+            d.push(Dot(450,240,COLORS.N,"N"));
+            d.push(A(70,105,230,135,COLORS.L));
+            d.push(A(380,135,120,220,COLORS.L));
+            d.push(A(70,105,430,200,COLORS.L));
+            d.push(A(120,220,430,200,COLORS.L));
+            d.push(A(70,145,430,240,COLORS.N));
+            return d.join("");
+          })}
+        </div>
+        <div class="row" style="gap:12px">
+          <div class="card"><h3>Dica</h3><div class="small">A minuteria substitui o teleruptor quando queres desligar automaticamente. Ajusta tempo no módulo.</div></div>
+          <div class="card"><h3>Proteção</h3><div class="small">DJ C10 + ID 30 mA.</div></div>
+        </div>
+      </div>`
+  },
+  {
+    id:"sensor",
+    cat:"Iluminação",
+    title:"Sensor de movimento — com saída para lâmpada",
+    desc:"Sensor PIR/MCU: L e N de alimentação + saída L' temporizada.",
+    tags:["sensor","PIR","iluminação"],
+    svg: ()=> `
+      <div class="sch-grid">
+        <div class="sch-card">
+          <h3>Esquema funcional</h3>
+          ${schSvgBox("Sensor — L/N + L' ", ({Box,Dot,L,A,Text,Title,COLORS})=>{
+            const d=[];
+            d.push(Box(20,90,180,210,"Quadro","Saída iluminação"));
+            d.push(Box(240,110,150,170,"Sensor","L / N / L'"));
+            d.push(Box(430,150,110,140,"Luz","Lâmpada"));
+            d.push(Dot(45,125,COLORS.L,"L"));
+            d.push(Dot(45,165,COLORS.N,"N"));
+            d.push(Dot(260,150,COLORS.L,"L (in)"));
+            d.push(Dot(260,190,COLORS.N,"N (in)"));
+            d.push(Dot(260,230,COLORS.L,"L' (out)"));
+            d.push(Dot(450,205,COLORS.L,"L'"));
+            d.push(Dot(450,240,COLORS.N,"N"));
+            d.push(A(70,125,240,150,COLORS.L));
+            d.push(A(70,165,240,190,COLORS.N));
+            d.push(A(390,230,430,205,COLORS.L));
+            d.push(A(70,165,430,240,COLORS.N));
+            return d.join("");
+          })}
+        </div>
+      </div>`
+  },
+  {
+    id:"tomada",
+    cat:"Tomadas",
+    title:"Tomada 230V — ligação correta (L/N/PE)",
+    desc:"Ligação básica de tomada com terra.",
+    tags:["tomada","230V","L N PE"],
+    svg: ()=> `
+      <div class="sch-grid">
+        <div class="sch-card">
+          <h3>Esquema funcional</h3>
+          ${schSvgBox("Tomada — multifilar", ({Box,Dot,L,A,Text,Title,COLORS})=>{
+            const d=[];
+            d.push(Box(30,100,200,180,"Quadro","Saída tomadas"));
+            d.push(Box(310,120,220,140,"Tomada","L / N / PE"));
+            d.push(Dot(55,135,COLORS.L,"L"));
+            d.push(Dot(55,175,COLORS.N,"N"));
+            d.push(Dot(55,215,COLORS.PE,"PE"));
+            d.push(Dot(330,160,COLORS.L,"L"));
+            d.push(Dot(330,200,COLORS.N,"N"));
+            d.push(Dot(330,240,COLORS.PE,"PE"));
+            d.push(A(80,135,310,160,COLORS.L));
+            d.push(A(80,175,310,200,COLORS.N));
+            d.push(A(80,215,310,240,COLORS.PE));
+            return d.join("");
+          })}
+        </div>
+        <div class="row" style="gap:12px">
+          <div class="card"><h3>Cabo</h3><div class="small">3×2,5 mm² (L/N/PE) — circuitos de tomadas.</div></div>
+          <div class="card"><h3>Proteção</h3><div class="small">DJ C16 (tomadas) + ID 30 mA. Respeitar norma RTIEBT.</div></div>
+        </div>
+      </div>`
+  },
+  {
+    id:"campainha",
+    cat:"Baixa tensão",
+    title:"Campainha 12V — transformador + botão",
+    desc:"Circuito típico: trafo no quadro, botão e campainha.",
+    tags:["campainha","12V","trafo"],
+    svg: ()=> `
+      <div class="sch-grid">
+        <div class="sch-card">
+          <h3>Esquema funcional</h3>
+          ${schSvgBox("Campainha — princípio", ({Box,Dot,L,A,Text,Title,COLORS})=>{
+            const d=[];
+            d.push(Box(20,90,200,210,"Quadro","Trafo 230→12V"));
+            d.push(Box(260,120,120,120,"Botão","NO"));
+            d.push(Box(410,150,130,140,"Campainha","12V"));
+            d.push(Dot(45,125,COLORS.L,"230V L"));
+            d.push(Dot(45,165,COLORS.N,"230V N"));
+            d.push(Dot(45,225,"#f6c85f","12V +"));
+            d.push(Dot(45,255,"#f6c85f","12V -"));
+            d.push(Dot(280,175,"#f6c85f","+"));
+            d.push(Dot(280,215,"#f6c85f","-"));
+            d.push(Dot(430,210,"#f6c85f","+"));
+            d.push(Dot(430,240,"#f6c85f","-"));
+            d.push(A(80,225,260,175,"#f6c85f"));
+            d.push(A(380,175,410,210,"#f6c85f"));
+            d.push(A(80,255,410,240,"#f6c85f"));
+            return d.join("");
+          })}
+        </div>
+      </div>`
+  }
+
+];
         d.push(R(40,80,150,140,"Caixa derivação"));
         d.push(R(220,95,120,110,"Interruptor"));
         d.push(R(390,90,90,120,"Luminária"));
@@ -17901,7 +18214,22 @@ function installOpenSchemaFallback(){
     }
   };
 
-  function renderSchema(id){
+  
+  function fixSchemaSvgs(root){
+    try{
+      (root||document).querySelectorAll("svg").forEach(svg=>{
+        const wirePaths = svg.querySelectorAll("path.sch-wirepath");
+        if(!wirePaths || !wirePaths.length) return;
+        // move each wire path to the start of its own parent group (fica por baixo de textos/pontos)
+        wirePaths.forEach(p=>{
+          const par = p.parentNode;
+          if(par) par.insertBefore(p, par.firstChild);
+        });
+      });
+    }catch(_){}
+  }
+
+function renderSchema(id){
     const box = byId("esqView");
     const s = SCHEMAS[id];
     if(!box || !s) return;
@@ -17943,6 +18271,7 @@ function installOpenSchemaFallback(){
         </ul>
       </div>
     `;
+    fixSchemaSvgs(box);
     box.scrollIntoView({behavior:"smooth", block:"start"});
   }
 
