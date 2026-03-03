@@ -4,6 +4,56 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
+
+<!-- ===== DavElec PWA GitHub base-path bootstrap (fixes no-trailing-slash /DavElec27 issue) ===== -->
+<script>
+(function(){
+  try{
+    var p = location.pathname || "/";
+    var last = p.split("/").filter(Boolean).slice(-1)[0] || "";
+    // If URL is like /RepoName (no slash, no extension), treat as directory and force basePath = /RepoName/
+    var isFile = last.indexOf(".") !== -1;
+    var basePath = p.endsWith("/") ? p : (isFile ? p.substring(0, p.lastIndexOf("/") + 1) : (p + "/"));
+    window.__DAV_BASE_PATH__ = basePath;
+
+    // Ensure we are actually on the directory URL so relative routing works everywhere (Chrome/PWA sometimes opens without slash)
+    if(!p.endsWith("/") && !isFile){
+      location.replace(basePath + location.search + location.hash);
+      return;
+    }
+
+    // Wire manifest + icons with safe absolute paths
+    var head = document.head || document.getElementsByTagName("head")[0];
+
+    function upsertLink(id, rel, href, extra){
+      var el = document.getElementById(id);
+      if(!el){
+        el = document.createElement("link");
+        el.id = id;
+        el.rel = rel;
+        head.appendChild(el);
+      }
+      el.href = href;
+      if(extra){
+        for(var k in extra){ try{ el.setAttribute(k, extra[k]); }catch(e){} }
+      }
+      return el;
+    }
+
+    upsertLink("dav-manifest","manifest", basePath + "manifest.webmanifest");
+    upsertLink("dav-icon-192","icon", basePath + "icon-192.png", {"sizes":"192x192"});
+    upsertLink("dav-icon-512","icon", basePath + "icon-512.png", {"sizes":"512x512"});
+    upsertLink("dav-apple","apple-touch-icon", basePath + "icon-192.png");
+
+    // Load PWA register script from the correct basePath (avoids 404 HTML -> 'Unexpected token <')
+    var s = document.createElement("script");
+    s.src = basePath + "pwa-register.js";
+    s.defer = true;
+    head.appendChild(s);
+  }catch(e){}
+})();
+</script>
+
 <title>DavElec</title>
 <style>
 /* ========== VARIÁVEIS E BASE ========== */
@@ -76,7 +126,6 @@ button.ghost{background:#0f1727;color:#adc0e6}
   color:#0b1020;
 }
 
-
 .status-ok,
 .status-warn,
 .status-bad{
@@ -110,9 +159,6 @@ button.ghost{background:#0f1727;color:#adc0e6}
   background:rgba(248,113,113,.14);
   border:1px solid rgba(248,113,113,.26);
 }
-
-
-
 
 /* --- HOME: cartão mais moderno --- */
 #home .card{
@@ -236,10 +282,8 @@ nav button.active{
 
 .page{display:none;padding:16px 16px 90px}
 
-
 /* --- HOME: título principal mais compacto --- */
 #home h2{ font-size:18px; letter-spacing:.2px; margin-bottom:10px; }
-
 
 /* --- HOME: subtítulo em "meta line" --- */
 #home .homeMeta{
@@ -410,7 +454,6 @@ video{width:100%;max-height:45vh;display:block;background:#000}
   font-size:12px;
   color:#fff;
 }
-
 
 /* ========== SPLASH (UI Modern) ========== */
 #welcome{
@@ -630,7 +673,6 @@ video{width:100%;max-height:45vh;display:block;background:#000}
 #welcome .btnStart.zap .zapFx{ animation: zapSweep .46s ease; }
 #welcome .btnStart.zap .ico{ animation: zapJolt .46s ease; }
 
-
 .welRow{
   display:flex;
   gap:10px;
@@ -712,7 +754,6 @@ video{width:100%;max-height:45vh;display:block;background:#000}
   .welLogoWrap{ transform: scale(.82); }
   #welGrid{ gap:12px; }
 }
-
 
 /* ====== QUADRO (visual) ====== */
 #q_canvas{display:flex;flex-direction:column;gap:10px}
@@ -830,7 +871,6 @@ video{width:100%;max-height:45vh;display:block;background:#000}
 #page_circuitos .row.compact-top .btn{padding:10px 12px !important; font-size:16px !important; border-radius:16px !important;}
 #page_circuitos .row.compact-top select{height:44px !important; font-size:16px !important;}
 #page_circuitos .row.compact-top .btn.big{padding:12px 14px !important;}
-
 
 #dr_goal, #dr_out, #dr_suggest, .dr-suggest{display:none!important;}
 
@@ -964,7 +1004,6 @@ overflow:visible}
 .swipeDangerText{ font-size:13px; }
 .swText{ flex:1; min-width:0; }
 
-
 /* ===== Esquemas ===== */
 .schCard{ padding:14px; border-radius:18px; border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.04); display:flex; gap:12px; align-items:flex-start; justify-content:space-between; }
 .schLeft{ flex:1; min-width:0; }
@@ -975,11 +1014,9 @@ overflow:visible}
 .schBtn{ white-space:nowrap; }
 #schSvgWrap svg{ width:100%; height:auto; }
 
-
 .suggestBox{margin-top:8px;display:flex;flex-wrap:wrap;gap:8px}
 .suggestChip{padding:8px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);font-size:.95rem;cursor:pointer}
 .suggestChip:active{transform:scale(.98)}
-
 
   .suggest-wrap{
     margin-top:8px;
@@ -1051,7 +1088,6 @@ details.fold .foldBody{ padding:12px; border-top:1px solid rgba(255,255,255,.08)
 }
 .actionsBar .primary, .actionsBar .ghost, .actionsBar .btn{ width:auto; }
 .actionsBar .spacer{ flex:1; }
-
 
 /* --- SECÇÃO PRO: resultados em cards --- */
 .resultBox{padding:14px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.10);box-shadow:0 18px 46px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.10)}
@@ -1146,9 +1182,6 @@ details.fold .foldBody{ padding:12px; border-top:1px solid rgba(255,255,255,.08)
 .tubeMeta b{color:#e8eefc}
 .tubeActions{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap}
 
-
-
-
 /* --- Potência Contratada: resultado mais claro --- */
 .pcRes{margin-top:10px}
 .pcHero{
@@ -1181,7 +1214,6 @@ details.fold .foldBody{ padding:12px; border-top:1px solid rgba(255,255,255,.08)
   background-size:auto,18px 18px;
 }
 
-
 /* --- Toggles TT / Potência Contratada: seta elegante + animação --- */
 .sectionToggle{
   cursor:pointer;
@@ -1212,7 +1244,6 @@ details.fold .foldBody{ padding:12px; border-top:1px solid rgba(255,255,255,.08)
 .sectionToggle.open .chev{transform:rotate(180deg)}
 .sectionToggle .chev span{display:block;transform:translateY(-1px)}
 
-
 /* --- SECÇÃO: Verificações alinhadas (3 colunas centradas) --- */
 .vLine{
   display:grid;
@@ -1238,7 +1269,6 @@ details.fold .foldBody{ padding:12px; border-top:1px solid rgba(255,255,255,.08)
 .vLine.warn{color:#fbbf24}
 .vLine.bad{color:#ef4444}
 
-
 /* --- Conversor: layout premium --- */
 .convLayout{display:grid;grid-template-columns:1fr;gap:12px}
 .convCardTitle{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
@@ -1258,7 +1288,6 @@ details.fold .foldBody{ padding:12px; border-top:1px solid rgba(255,255,255,.08)
 .convHistItem{padding:8px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.14);
   color:#cdd7ee;font-size:12.5px;margin-bottom:8px;cursor:pointer}
 .convHistItem:active{transform:scale(.99)}
-
 
 /* UI cleanup: hide pill lists to keep selection light */
 #presetPills, #quickPills { display:none !important; }
@@ -1294,7 +1323,6 @@ details.fold .foldBody{ padding:12px; border-top:1px solid rgba(255,255,255,.08)
 .davChip small{color:var(--mut)}
 .davChip:active{transform:scale(.99)}
 
-
 /* Clamp texts inside DIN modules (avoids overflow in PDF and in-app visual) */
 .dinBox .name, .dinBox .sub, .dinBox .meta{
   overflow: hidden !important;
@@ -1326,7 +1354,6 @@ details.fold .foldBody{ padding:12px; border-top:1px solid rgba(255,255,255,.08)
 .pcItem .v{font-size:14px;font-weight:700;color:rgba(255,255,255,.92)}
 .pcNote{margin-top:10px;font-size:12px;line-height:1.25;color:rgba(255,255,255,.65)}
 
-
 /* v373 Quadro: DJ mark (C10/C16/...) */
 .dinBox.dj{position:relative}
 .dinBox.dj .djMark{
@@ -1337,7 +1364,6 @@ details.fold .foldBody{ padding:12px; border-top:1px solid rgba(255,255,255,.08)
   color:rgba(255,255,255,.92);
 }
 .dinBox.dj .djMark small{font-size:10px;font-weight:800;opacity:.85}
-
 
 .svgwrap .schDiagImg{width:100%;height:auto;display:block;max-height:260px;object-fit:contain;}
 
@@ -1392,7 +1418,6 @@ details.fold .foldBody{ padding:12px; border-top:1px solid rgba(255,255,255,.08)
 }
 #orcamentos .totals .grand strong{font-size:19px}
 #orcamentos .hintBox{border-radius:16px}
-
 
 /* === UI upgrade: Itens em cartões compactos + Totais sticky === */
 #orcSection .orcItemRow, #orcSection .orcItemCard{ width:100%; }
@@ -1461,7 +1486,6 @@ function __oc(o, p){
   const v = o[p];
   return (typeof v === "function") ? v.bind(o) : v;
 }
-
 
 // Debug flag (set true to show JS errors on screen)
 window.DEBUG_ERRORS = false;
@@ -1781,7 +1805,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
 #q_canvas .dinBox, #q_canvas .dinFill{ scroll-snap-align:start; }
 </style>
 
-
 <style id="dinCarouselFix">
 /* ===== Quadro (DIN): carrossel horizontal por fila (Android/WebView safe) ===== */
 #q_canvas .dinRow{
@@ -1837,12 +1860,8 @@ window.addEventListener('DOMContentLoaded', ()=>{
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
-<link rel="manifest" href="./manifest.webmanifest">
-  <meta name="theme-color" content="#0b1020">
-  <script src="./pwa-register.js"></script>
-  <link rel="apple-touch-icon" href="./icon-192.png">
-
-  <style id="dav-splash-css">
+<meta name="theme-color" content="#0b1020">
+<style id="dav-splash-css">
     .dav-splash{
       position:fixed; inset:0; z-index:999999;
       display:flex; align-items:center; justify-content:center;
@@ -1900,7 +1919,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
     <div class="dav-splash-sub">Instalações • Cálculo • Quadros</div>
   </div>
 </div>
-
 
 <!-- ========== SPLASH ========== -->
 <section aria-label="Ecrã inicial" id="welcome">
@@ -2635,7 +2653,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
   </div>
 </section>
 
-
 <!-- ========== ESQUEMAS ========== -->
 <section class="page" id="esquemas" style="display:none">
   <h2>Esquemas</h2>
@@ -2721,7 +2738,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
     </div>
   </div>
 </section>
-
 
 <section class="page" id="obra">
 <h2>Obra</h2>
@@ -2927,7 +2943,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
           </div>
         </div>
 
-
         </div>
           </div>
         </details>
@@ -3132,7 +3147,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
     </div>
   </details>
 </section>
-
 
 <section class="page" id="formulas">
   <h2>Fórmulas</h2>
@@ -3381,8 +3395,6 @@ function loadObrasList(){
   if(typeof renderListaObras==='function') renderListaObras();
 }
 
-
-
 // ===== DavElec utilidades (toast + export seguro) =====
 function toast(msg, ms=2200){
   try{
@@ -3538,7 +3550,6 @@ function esc_copy(){
   }catch(e){}
 }
 
-
 function esc_toMeters(value, unit){
   if (!isFinite(value)) return NaN;
   if (unit === 'm') return value;
@@ -3646,8 +3657,6 @@ if(typeof renderListaObras==='function') renderListaObras(); }catch(e){}
   diag_init();
 });
 
-
-
 // Prefill Secção from Circuitos (localStorage bridge)
 function dav_applySecaoPrefill(){
   try{
@@ -3703,8 +3712,6 @@ function dav_applySecaoPrefill(){
     // ignore
   }
 }
-
-
 
 function show(id, btn){
   document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
@@ -3766,7 +3773,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Tabelas de correntes admissíveis (simplificado)
-
 
 // ========== INSTALAÇÃO (HAB/COM/IND/EXT) PILL GROUP ==========
 let instAtual = 'hab'; // padrão: Habitação
@@ -3831,7 +3837,6 @@ function secPorAmp(Ib, mat){
   }
   return 240;
 }
-
 
 // --- Quadro mode helpers (basic/pro) ---
 function openQuadro(btn){
@@ -3898,7 +3903,6 @@ function peFor(S){
   return Math.round(S * 0.5);
 }
 
-
 // ===== Fatores (aproximação conservadora) =====
 // Nota: Para rigor total por tabela IEC/RTIEBT, seria necessário escolher também
 // nº de condutores carregados e a tabela completa por método. Aqui aplicamos
@@ -3918,7 +3922,6 @@ function fatorMetodo(m){
   const map = {B:1.00, C:1.10, D:0.95};
   return map[m] ?? 1.00;
 }
-
 
 function areaCaboExt(sec){
   const d = CABO_DIAMETRO[sec] || 4.9;
@@ -3958,7 +3961,6 @@ function tuboDetalhado(sec, nCabos, isExterior){
 
   return {tubo:tuboEsc, ocup:ocupEsc, isExterior};
 }
-
 
 // Referências DOM
 const mode_m = document.getElementById('mode_m');
@@ -4046,7 +4048,6 @@ function sugestoesCoord(params){
   return `<div class="hr"></div>
           <div class="small"><b>Como corrigir:</b><br>• ${sug.join('<br>• ')}</div>`;
 }
-
 
 // cálculo principal
 function calcManual(){
@@ -4198,7 +4199,6 @@ function calcManual(){
           </details>
         </div>
 
-
       </div>
     </div>`;}
 /* ===================== CONVERSORES ===================== */
@@ -4229,7 +4229,6 @@ function Akw_t(){
 
 /* ===================== CIRCUITOS: CATALOGO + PRESETS ===================== */
 let circuitos=[];
-
 
 // ===== Performance: arranque sem lag =====
 let __dav_boot_done = false;
@@ -4403,7 +4402,6 @@ function initPcAutoCalc(){
 }
 document.addEventListener('DOMContentLoaded', initPcAutoCalc);
 
-
 function isTriMode(){ return getInstallMode()==='tri'; }
 
 function djModulesForCircuit(c){
@@ -4411,7 +4409,6 @@ function djModulesForCircuit(c){
   if(!isFinite(p) || p<1) return 1;
   return p; // 1P=1 módulo, 3P=3, 4P=4
 }
-
 
 const CATALOG={
 
@@ -4482,7 +4479,6 @@ const CATALOG={
   bomba_calor:{tipo:'Especial',desc:'Bomba de calor AQS',p_kw:3.0,sec:4,dj:20}
 
 };
-
 
 /* Presets Opção 1 – Habitação moderna */
 const PRESET_AVG_CIRCUITS = {
@@ -4666,7 +4662,6 @@ const PRESETS={
     {ref:'rede_rack',q:1}
   ]
 };
-
 
 /* ========== FUNÇÕES AUX – TOMADAS (8 por disjuntor) ========== */
 function normalizeTomadas(){
@@ -4932,8 +4927,6 @@ function addQuick(){
   davQuickOpen();
 }
 
-
-
 // ===== Adicionar Rápido (Modal) =====
 const DAV_QUICK_GROUPS = [
   {title:'Habitação — Base', items:[
@@ -5049,7 +5042,6 @@ document.addEventListener('keydown', (e)=>{
   const back=document.getElementById('davQuickModalBack');
   if(back && back.style.display==='flex') davQuickClose();
 });
-
 
 function delCirc(id){
   circuitos=circuitos.filter(c=>c.id!==id);
@@ -5471,7 +5463,6 @@ function cir_applyToSecao(){
   }
 }
 
-
 function limparCircuitos(){
   if(confirm('Limpar todos os circuitos?')){
     circuitos=[];
@@ -5595,9 +5586,6 @@ window.addEventListener('load', ()=>{
     });
   }
 });
-
-
-
 
 /* ===================== ANEXOS (IndexedDB) ===================== */
 const DB_ANEXOS_NAME = "davelec_db_v1";
@@ -5783,7 +5771,6 @@ window.addEventListener('load', ()=>{
     });
   }
 });
-
 
 /* ===================== ZIP EXPORTER (STORE, sem compressão) ===================== */
 function _u16(n){ return [n & 255, (n>>>8) & 255]; }
@@ -5983,7 +5970,6 @@ function renderListaObras(){
   });
 }
 
-
 function salvarObra(silent=false){
   try{
     const elNome = document.getElementById('obra_nome');
@@ -6029,7 +6015,6 @@ function salvarObra(silent=false){
     alert('Erro ao guardar a obra.');
   }
 }
-
 
 function novaObra(){
   obraAtual=null;
@@ -6413,7 +6398,6 @@ async function gerarPDF(opts){
     })).slice(0, 30);
   }catch(_e){ orcsLinked = []; }
 
-
   // cópia dos circuitos
   const circuitosList = normalizeCircuitos((window.circuitosParaPDF && window.circuitosParaPDF.length) ? window.circuitosParaPDF : ((window.obraAtual && window.obraAtual.circuitos) ? window.obraAtual.circuitos : window.circuitos));
   const cirRaw = JSON.parse(JSON.stringify(circuitosList || []));
@@ -6703,7 +6687,6 @@ async function gerarPDF(opts){
 
     pages.push(page.canvas);
   }
-
 
   /* ============ QUADRO (VISUAL) ============ */
   try{
@@ -7000,11 +6983,6 @@ async function pdfFromJpegs(jpegs, wPt, hPt) {
 }
 
 /* ===================== ESCALAS ===================== */
-
-
-
-
-
 
 /* ====== AVARIAS / DIAGNÓSTICO ====== */
 const DIAG_PROBLEMAS = [
@@ -8691,9 +8669,7 @@ const DIAG_PROBLEMAS = [
 `
     }
 
-
 ];
-
 
 let DIAG_CAT = 'ALL';
 
@@ -8763,8 +8739,6 @@ function diag_filter(isInit){
   }
   diag_render();
 }
-
-
 
 /* ====== QUADRO: GERADOR ====== */
 
@@ -9047,7 +9021,6 @@ function quadro_generate(){
   QUADRO_PLAN = {board, usedModules, requiredRows, drBlocks, extraSel, rows};
   window.QUADRO_PLAN = QUADRO_PLAN;
 
-
   // Summary: recommend board to buy based on actual required rows (for fixed we keep chosen but show suggestion)
   const recRows = (boardSel.mode==='fixed') ? board.rows : requiredRows;
   const rec = `${requiredRows} fila(s) × ${board.mods} módulos`;
@@ -9055,8 +9028,6 @@ function quadro_generate(){
 
   quadro_render_rows(rows, board.mods);
 }
-
-
 
 function quadro_djMark(cm){
   // Try to derive "C10/C16/..." from meta or label.
@@ -9122,7 +9093,6 @@ function quadro_format_meta(cm){
   }
   return parts.map(s=>`<div class="mline">${escapeHtml(s)}</div>`).join('');
 }
-
 
 function quadro_render_rows(rows, modulesPerRow){
   const canvas = document.getElementById('q_canvas');
@@ -9638,12 +9608,8 @@ function quadro_export_pdf(){
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
-<link rel="manifest" href="./manifest.webmanifest">
-  <meta name="theme-color" content="#0b1020">
-  <script src="./pwa-register.js"></script>
-  <link rel="apple-touch-icon" href="./icon-192.png">
-
-  <style id="dav-splash-css">
+<meta name="theme-color" content="#0b1020">
+<style id="dav-splash-css">
     .dav-splash{
       position:fixed; inset:0; z-index:999999;
       display:flex; align-items:center; justify-content:center;
@@ -9913,13 +9879,7 @@ function escapeHtml(s){
   }[ch]));
 }
 
-
-
-
-
 // ===================== RESUMO TÉCNICO (cálculo) =====================
-
-
 
 function fmtNum(n, dec=2){
   const v = Number(n);
@@ -9933,7 +9893,6 @@ function fmtEUR(n){
   return num.toLocaleString('pt-PT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
 }
 
-
 function normalizeCircuitos(src){
   if (Array.isArray(src)) return src;
   if (src && typeof src === 'object'){
@@ -9943,7 +9902,6 @@ function normalizeCircuitos(src){
   }
   return [];
 }
-
 
 function calcResumoTecnico(cirInput){
   // ===== Resumo técnico (Habitação PT) – modelo realista =====
@@ -10134,8 +10092,6 @@ function calcResumoTecnico(cirInput){
     disjGeral: dgA
   };
 }
-
-
 
 /* ===================== Conversor ===================== */
 function conv_cfg(type){
@@ -10359,7 +10315,6 @@ function conv_copy(){
         if(d && d[dk]!=null) inp.value = d[dk];
       });
     }
-
 
     const euro = (n)=> (Number(n)||0).toFixed(2).replace(".",",") + " €";
 
@@ -10718,9 +10673,6 @@ function conv_copy(){
       });
     }
 
-
-
-
     
     function updateCatalogDatalist(query){
       const dl = document.getElementById('orcCatalogDatalist');
@@ -10779,7 +10731,6 @@ function buildCatalog(){
         const un   = String(it.unidade||"").toLowerCase();
         return name.includes(q) || cat.includes(q) || un.includes(q);
       }) : all;
-
 
       // ordem “humana” (em vez de A-Z)
       const order = [
@@ -11403,7 +11354,6 @@ function onCatalogChange(){
         }
       }catch(_e){}
 
-
     function addItem(){
       syncHeaderFromUI();
 
@@ -11494,7 +11444,6 @@ function addServiceFromHeader(kind){
       render();
     }
 
-
     function duplicateItem(id){
       const it = state.items.find(x=>x.id===id);
       if(!it) return;
@@ -11505,7 +11454,6 @@ function addServiceFromHeader(kind){
       render();
       toast && toast("⧉ Item duplicado");
     }
-
 
     function removeItem(id){
       state.items = state.items.filter(x=>x.id!==id);
@@ -11599,8 +11547,6 @@ function addServiceFromHeader(kind){
     }
     // Render lista guardada (ao abrir a app)
     renderSavedBudgets();
-
-
 
     // ===================== ORÇAMENTOS GUARDADOS (lista) =====================
     
@@ -12072,8 +12018,6 @@ renderSavedBudgets();
       renderSavedBudgets();
     }
 
-
-
     function clearAll(){
       state.items = [];
       save(state);
@@ -12420,12 +12364,8 @@ renderSavedBudgets();
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
-<link rel="manifest" href="./manifest.webmanifest">
-  <meta name="theme-color" content="#0b1020">
-  <script src="./pwa-register.js"></script>
-  <link rel="apple-touch-icon" href="./icon-192.png">
-
-  <style id="dav-splash-css">
+<meta name="theme-color" content="#0b1020">
+<style id="dav-splash-css">
     .dav-splash{
       position:fixed; inset:0; z-index:999999;
       display:flex; align-items:center; justify-content:center;
@@ -12685,7 +12625,6 @@ renderSavedBudgets();
 }
 </style>
 
-
 <style id="dinTextImprove">
 /* ===== Quadro: melhoria de leitura dentro dos DR/DJ ===== */
 #q_canvas .dinBox .name{
@@ -12731,7 +12670,6 @@ renderSavedBudgets();
 #q_canvas .dinBox.dr .name{ -webkit-line-clamp:3!important; }
 </style>
 
-
 <style id="dinRowCounters">
 /* ===== Quadro: contagem de módulos + alerta discreto ===== */
 #q_canvas .dinRowLabel.din-ok{
@@ -12747,7 +12685,6 @@ renderSavedBudgets();
   box-shadow: 0 0 0 1px rgba(239,68,68,.18) inset!important;
 }
 </style>
-
 
 <style id="printDinImproveV2">
 @media print{
@@ -13244,7 +13181,6 @@ el.qtd = $("orcQtd");
       return L(x1,y1,x2,y2,stroke,sw,dash);
     };
 
-
     // Caminho manual (lista de pontos) — útil para estilo "Legrand" (canais fixos, sem cruzamentos)
     const P = (pts, stroke=COLORS.R, sw=5, dash="")=>{
       if(!pts || pts.length<2) return "";
@@ -13656,9 +13592,6 @@ d.push(W([[bN[0],bN[1]],[so.p.N[0],bN[1]],[so.p.N[0],so.p.N[1]]], COLORS.N,5));
       return d.join("");
     });
   }
-
-
-
 
   const SCHEMAS = [
     {
@@ -14106,9 +14039,6 @@ d.push(W([[bN[0],bN[1]],[so.p.N[0],bN[1]],[so.p.N[0],so.p.N[1]]], COLORS.N,5));
       })
     }
 
-
-
-
   
     ,
     {
@@ -14522,8 +14452,6 @@ d.push(W([[bN[0],bN[1]],[so.p.N[0],bN[1]],[so.p.N[0],so.p.N[1]]], COLORS.N,5));
     }
 ];
 
-
-
   const SCHEMA_SVG_OVERRIDE = {
     "sch_simple_light": schSvgLegrand_simple_light,
     "sch_two_way": schSvgLegrand_two_way,
@@ -14567,7 +14495,6 @@ function initSchemes(){
       addAll: document.getElementById('schAddAllBtn')
     };
 
-
 // --- Esquemas: helper para renderizar o diagrama (SVG) de forma compatível (Android/Chrome/pdf) ---
 function setSchDiagram(svgString){
   const wrap = schEl.svg;
@@ -14596,7 +14523,6 @@ function setSchDiagram(svgString){
     }
   }
 }
-
 
   const openSchema = (s) => {
   let svgHtml = "";
@@ -14780,8 +14706,6 @@ const id = s.id || "";
 }
 schEl.svg.innerHTML = svgHtml;
 
-
-
   SCH_VIEW.currentId = s.id || null;
   // Boxes availability per schema
   const tb = document.getElementById('schToggleBoxes');
@@ -14796,7 +14720,6 @@ schEl.svg.innerHTML = svgHtml;
   schAnnotateSteps();
   schApplyBoxes();
   schApplyStep(0);
-
 
   // Hide raw code area (keep for debug if needed)
   if(schEl.svgCode){ schEl.svgCode.textContent = ""; schEl.svgCode.style.display = "none"; }
@@ -14828,7 +14751,6 @@ schEl.svg.innerHTML = svgHtml;
   if(schEl.modal){ schEl.modal.style.display = "flex"; schEl.modal.classList.add("show"); }
   document.body.classList.add("modal-open");
 };
-
 
 // ===== Esquemas: PASSO-A-PASSO + Caixas =====
 window.SCH_VIEW = window.SCH_VIEW || { step: 0, boxes: false, currentId: null };
@@ -15002,13 +14924,11 @@ function schBindControls(){
   });
 }
 
-
 const closeModal = ()=>{
       if(schEl.modal){ schEl.modal.classList.remove("show"); schEl.modal.style.display="none"; }
       document.body.classList.remove("modal-open");
       current = null;
     };
-
 
   // ---- Esquemas: estado + favoritos + render da lista (fix base) ----
   let showFavs = false;
@@ -15099,7 +15019,6 @@ const closeModal = ()=>{
     });
   };
 
-
     // Events
     schEl.search.addEventListener('input', ()=>{
       renderSuggest(schEl.search.value);
@@ -15169,7 +15088,6 @@ const closeModal = ()=>{
 
     renderList();
   }
-
 
   // Hook init on load
   document.addEventListener('DOMContentLoaded', ()=>{ try{ initSchemes(); }catch(e){ console.error(e); } });
@@ -15393,7 +15311,6 @@ const closeModal = ()=>{
       </div>
     
 
-
       <div class="card" style="padding:12px; background:rgba(255,255,255,.03)">
         <div style="font-weight:900; margin-bottom:6px">Visual DIN (18 módulos)</div>
         <div id="qpDinSummary"></div>
@@ -15522,8 +15439,6 @@ const closeModal = ()=>{
   mount.innerHTML = html;
 };
 
-
-
 const renderList = (st)=>{
     const list = $("qpList");
     if(!list) return;
@@ -15564,7 +15479,6 @@ const renderList = (st)=>{
     const out = $("qpOut");
 
     const toOrcBtn = $("qpToOrc");
-
 
     if(!ph || !genBtn || !addBtn || !calcBtn) return;
 
@@ -15732,8 +15646,6 @@ const renderList = (st)=>{
 
   document.addEventListener("DOMContentLoaded", bind);
 })();
-
-
 
 /* ===================== OBRAS PRO (A+B: local + export/import) ===================== */
 (function(){
@@ -16112,7 +16024,6 @@ const renderList = (st)=>{
   document.addEventListener("DOMContentLoaded", bind);
 })();
 
-
 // === Fórmulas + Calculadora ===
 const FORMULAS = [
   {
@@ -16312,12 +16223,6 @@ document.addEventListener('click', (e)=>{
 
 </script>
 
-
-
-
-
-
-
 <script>
 (function(){
   function setSplashLogo(){
@@ -16337,7 +16242,6 @@ document.addEventListener('click', (e)=>{
   }
 })();
 </script>
-
 
 <script>
 
@@ -16548,7 +16452,6 @@ function resetPotenciaContratada(){
     const elRes = $("out_pc"); if(elRes) elRes.innerHTML = "";
 }
 
-
 })();
 
 (function(){
@@ -16640,7 +16543,6 @@ function resetPotenciaContratada(){
     <div id="davQuickBody" class="davQuickGrid"></div>
   </div>
 </div>
-
 
 <style id="dinIndustrialOverride">
 /* ===== QUADRO (B): Industrial técnico — override final (ganha às regras antigas) ===== */
@@ -16744,7 +16646,6 @@ function resetPotenciaContratada(){
 }
 </style>
 
-
 <style id="dinTextImprove">
 /* ===== Quadro: melhoria de leitura dentro dos DR/DJ ===== */
 #q_canvas .dinBox .name{
@@ -16790,7 +16691,6 @@ function resetPotenciaContratada(){
 #q_canvas .dinBox.dr .name{ -webkit-line-clamp:3!important; }
 </style>
 
-
 <style id="dinRowCounters">
 /* ===== Quadro: contagem de módulos + alerta discreto ===== */
 #q_canvas .dinRowLabel.din-ok{
@@ -16806,7 +16706,6 @@ function resetPotenciaContratada(){
   box-shadow: 0 0 0 1px rgba(239,68,68,.18) inset!important;
 }
 </style>
-
 
 <style id="printDinImproveV2">
 @media print{
@@ -16839,10 +16738,6 @@ function resetPotenciaContratada(){
 /* Screen preview (android) also benefits: */
 .dinVisual, #dinVisual, .din-visual{ zoom: 1.08; }
 </style>
-
-
-
-
 
 <script>
 /* === DavElec v357 patch: fix bindings (TT + Potência Contratada + Start) - ES5 safe === */
@@ -17029,7 +16924,6 @@ function resetPotenciaContratada(){
 })();
 </script>
 
-
 <script>
 /* ===== DavElec v372: Quadro Plus (modo mono/tri local + objetivo DR) ===== */
 (function(){
@@ -17062,7 +16956,6 @@ function resetPotenciaContratada(){
   }, false);
 })();
 </script>
-
 
 <script>
 /* ===== DavElec v389: Biblioteca de Esquemas (15) + SVG garantido ===== */
@@ -17585,7 +17478,6 @@ function schSvgPro(id, stepKey, withBoxes){
       b += W(C.AUX, `${tx+dx},${ty+dy} ${tx+dx},${ty}`, 1);
       b += W(C.AUX, `${tx+2*dx},${ty+dy} ${tx+2*dx},${ty}`, 1);
 
-
     // delta links (horizontal) as dashed
     if(step>=2){
       b += `<polyline points="${tx},${ty} ${tx+dx},${ty}" fill="none" stroke="${C.CTRL}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`;
@@ -17866,7 +17758,6 @@ function installOpenSchemaFallback(){
 
 })();
 </script>
-
 
 <script id="dinCarouselJS">
 /* === Quadro: swipe horizontal consistente (lock de eixo) === */

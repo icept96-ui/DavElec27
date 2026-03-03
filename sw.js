@@ -1,5 +1,5 @@
 // DavElec Service Worker (safe cache)
-const CACHE_NAME = "davelec-v604";
+const CACHE_NAME = "davelec-v605";
 const ASSETS = [
   "./",
   "./index.html",
