@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
-<title>DavElec — v439 (Obras Anexos + ZIP)</title>
+<title>DavElec</title>
 <style>
 /* ========== VARIÁVEIS E BASE ========== */
 :root{
@@ -1837,23 +1837,70 @@ window.addEventListener('DOMContentLoaded', ()=>{
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
+<link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0b1020">
+  <script src="./pwa-register.js"></script>
+  <link rel="apple-touch-icon" href="./icon-192.png">
 
-<link rel="manifest" href="manifest.webmanifest">
-
-<meta name="theme-color" content="#0b1020">
-
-<style>
-#davelec_splash{position:fixed;inset:0;background:#0b1020;display:flex;align-items:center;justify-content:center;z-index:999999;transition:opacity .25s ease}
-#davelec_splash.hide{opacity:0;pointer-events:none}
-#davelec_splash .wrap{display:flex;flex-direction:column;align-items:center;gap:14px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#fff}
-#davelec_splash .logo{width:92px;height:92px;border-radius:22px;background:linear-gradient(145deg,#102044,#0b1020);display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.06)}
-#davelec_splash .title{font-weight:800;font-size:22px;letter-spacing:.3px}
-#davelec_splash .sub{opacity:.7;font-size:13px}
-@media (prefers-reduced-motion: reduce){#davelec_splash{transition:none}}
-</style>
+  <style id="dav-splash-css">
+    .dav-splash{
+      position:fixed; inset:0; z-index:999999;
+      display:flex; align-items:center; justify-content:center;
+      background: radial-gradient(900px 520px at 50% -10%, rgba(72,196,255,.25), transparent 60%),
+                  radial-gradient(900px 520px at 50% 110%, rgba(255,196,72,.18), transparent 55%),
+                  #0b1020;
+      overflow:hidden;
+      transition: opacity .45s ease, transform .45s ease;
+    }
+    .dav-splash.hide{ opacity:0; transform:scale(1.02); pointer-events:none; }
+    .dav-splash-inner{ text-align:center; padding:24px; }
+    .dav-splash-logo{
+      width:min(168px, 42vw); height:auto;
+      filter: drop-shadow(0 18px 40px rgba(0,0,0,.55));
+      animation: davLogo 1.35s ease-in-out infinite;
+      border-radius: 22%;
+    }
+    @keyframes davLogo{
+      0%{ transform: translateY(0) rotate(-2deg) scale(1); }
+      50%{ transform: translateY(-8px) rotate(2deg) scale(1.03); }
+      100%{ transform: translateY(0) rotate(-2deg) scale(1); }
+    }
+    .dav-splash-title{
+      margin-top:14px; font-size:22px; font-weight:800; letter-spacing:.3px;
+      color:#eaf2ff;
+      text-shadow:0 10px 30px rgba(0,0,0,.5);
+    }
+    .dav-splash-sub{
+      margin-top:6px; font-size:13px; opacity:.8; color:#cfe3ff;
+    }
+    .dav-splash-sheen{
+      position:absolute; inset:-30%;
+      background: linear-gradient(120deg, transparent 35%, rgba(255,255,255,.12) 50%, transparent 65%);
+      transform: translateX(-45%) rotate(8deg);
+      animation: davSheen 1.9s ease-in-out infinite;
+      pointer-events:none;
+      mix-blend-mode: screen;
+    }
+    @keyframes davSheen{
+      0%{ transform: translateX(-45%) rotate(8deg); opacity:.0; }
+      15%{ opacity:.25; }
+      55%{ opacity:.22; }
+      100%{ transform: translateX(45%) rotate(8deg); opacity:.0; }
+    }
+  </style>
 
 </head>
 <body>
+
+<div id="davSplash" class="dav-splash" aria-hidden="true">
+  <div class="dav-splash-sheen"></div>
+  <div class="dav-splash-inner">
+    <img class="dav-splash-logo" src="./icon-512.png" alt="">
+    <div class="dav-splash-title">DavElec</div>
+    <div class="dav-splash-sub">Instalações • Cálculo • Quadros</div>
+  </div>
+</div>
+
 
 <!-- ========== SPLASH ========== -->
 <section aria-label="Ecrã inicial" id="welcome">
@@ -9505,7 +9552,7 @@ function quadro_export_pdf(){
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>DavElec - Quadro</title>
+  <title>DavElec</title>
   <style>
     @page{ size:A4 landscape; margin:10mm; }
     body{ font-family: Arial, sans-serif; color:#111; }
@@ -9591,21 +9638,70 @@ function quadro_export_pdf(){
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
+<link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0b1020">
+  <script src="./pwa-register.js"></script>
+  <link rel="apple-touch-icon" href="./icon-192.png">
 
-<meta name="theme-color" content="#0b1020">
-
-<style>
-#davelec_splash{position:fixed;inset:0;background:#0b1020;display:flex;align-items:center;justify-content:center;z-index:999999;transition:opacity .25s ease}
-#davelec_splash.hide{opacity:0;pointer-events:none}
-#davelec_splash .wrap{display:flex;flex-direction:column;align-items:center;gap:14px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#fff}
-#davelec_splash .logo{width:92px;height:92px;border-radius:22px;background:linear-gradient(145deg,#102044,#0b1020);display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.06)}
-#davelec_splash .title{font-weight:800;font-size:22px;letter-spacing:.3px}
-#davelec_splash .sub{opacity:.7;font-size:13px}
-@media (prefers-reduced-motion: reduce){#davelec_splash{transition:none}}
-</style>
+  <style id="dav-splash-css">
+    .dav-splash{
+      position:fixed; inset:0; z-index:999999;
+      display:flex; align-items:center; justify-content:center;
+      background: radial-gradient(900px 520px at 50% -10%, rgba(72,196,255,.25), transparent 60%),
+                  radial-gradient(900px 520px at 50% 110%, rgba(255,196,72,.18), transparent 55%),
+                  #0b1020;
+      overflow:hidden;
+      transition: opacity .45s ease, transform .45s ease;
+    }
+    .dav-splash.hide{ opacity:0; transform:scale(1.02); pointer-events:none; }
+    .dav-splash-inner{ text-align:center; padding:24px; }
+    .dav-splash-logo{
+      width:min(168px, 42vw); height:auto;
+      filter: drop-shadow(0 18px 40px rgba(0,0,0,.55));
+      animation: davLogo 1.35s ease-in-out infinite;
+      border-radius: 22%;
+    }
+    @keyframes davLogo{
+      0%{ transform: translateY(0) rotate(-2deg) scale(1); }
+      50%{ transform: translateY(-8px) rotate(2deg) scale(1.03); }
+      100%{ transform: translateY(0) rotate(-2deg) scale(1); }
+    }
+    .dav-splash-title{
+      margin-top:14px; font-size:22px; font-weight:800; letter-spacing:.3px;
+      color:#eaf2ff;
+      text-shadow:0 10px 30px rgba(0,0,0,.5);
+    }
+    .dav-splash-sub{
+      margin-top:6px; font-size:13px; opacity:.8; color:#cfe3ff;
+    }
+    .dav-splash-sheen{
+      position:absolute; inset:-30%;
+      background: linear-gradient(120deg, transparent 35%, rgba(255,255,255,.12) 50%, transparent 65%);
+      transform: translateX(-45%) rotate(8deg);
+      animation: davSheen 1.9s ease-in-out infinite;
+      pointer-events:none;
+      mix-blend-mode: screen;
+    }
+    @keyframes davSheen{
+      0%{ transform: translateX(-45%) rotate(8deg); opacity:.0; }
+      15%{ opacity:.25; }
+      55%{ opacity:.22; }
+      100%{ transform: translateX(45%) rotate(8deg); opacity:.0; }
+    }
+  </style>
 
 </head>
 <body>
+
+<div id="davSplash" class="dav-splash" aria-hidden="true">
+  <div class="dav-splash-sheen"></div>
+  <div class="dav-splash-inner">
+    <img class="dav-splash-logo" src="./icon-512.png" alt="">
+    <div class="dav-splash-title">DavElec</div>
+    <div class="dav-splash-sub">Instalações • Cálculo • Quadros</div>
+  </div>
+</div>
+
   <div class="hdr">
     <div>
       <div class="brand">
@@ -9778,6 +9874,28 @@ function quadro_export_pdf(){
 
 })();
 <\/script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js");});}</script>
+
+<script id="dav-splash-js">
+(function(){
+  function hideSplash(){
+    var el = document.getElementById("davSplash");
+    if(!el) return;
+    el.classList.add("hide");
+    setTimeout(function(){ el.remove(); }, 700);
+  }
+  // hide on load, but keep a minimum time so it feels premium
+  var start = Date.now();
+  window.addEventListener("load", function(){
+    var elapsed = Date.now() - start;
+    var wait = Math.max(450, 850 - elapsed);
+    setTimeout(hideSplash, wait);
+  });
+  // safety fallback
+  setTimeout(hideSplash, 2200);
+})();
+</script>
+
 </body>
 </html>`;
 
@@ -12001,7 +12119,7 @@ renderSavedBudgets();
       const html = `<!doctype html>
 <html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Orçamento ${escapeHtml(numero || "")} - ${escapeHtml(cliente)}</title>
+<title>DavElec</title>
 <style>
   @page{ size:A4; margin:8mm; }
   *{ box-sizing:border-box; }
@@ -12302,21 +12420,70 @@ renderSavedBudgets();
 #q_canvas .dinRow.din-can-left::before{ opacity:1; }
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
+<link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0b1020">
+  <script src="./pwa-register.js"></script>
+  <link rel="apple-touch-icon" href="./icon-192.png">
 
-<meta name="theme-color" content="#0b1020">
-
-<style>
-#davelec_splash{position:fixed;inset:0;background:#0b1020;display:flex;align-items:center;justify-content:center;z-index:999999;transition:opacity .25s ease}
-#davelec_splash.hide{opacity:0;pointer-events:none}
-#davelec_splash .wrap{display:flex;flex-direction:column;align-items:center;gap:14px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#fff}
-#davelec_splash .logo{width:92px;height:92px;border-radius:22px;background:linear-gradient(145deg,#102044,#0b1020);display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.06)}
-#davelec_splash .title{font-weight:800;font-size:22px;letter-spacing:.3px}
-#davelec_splash .sub{opacity:.7;font-size:13px}
-@media (prefers-reduced-motion: reduce){#davelec_splash{transition:none}}
-</style>
+  <style id="dav-splash-css">
+    .dav-splash{
+      position:fixed; inset:0; z-index:999999;
+      display:flex; align-items:center; justify-content:center;
+      background: radial-gradient(900px 520px at 50% -10%, rgba(72,196,255,.25), transparent 60%),
+                  radial-gradient(900px 520px at 50% 110%, rgba(255,196,72,.18), transparent 55%),
+                  #0b1020;
+      overflow:hidden;
+      transition: opacity .45s ease, transform .45s ease;
+    }
+    .dav-splash.hide{ opacity:0; transform:scale(1.02); pointer-events:none; }
+    .dav-splash-inner{ text-align:center; padding:24px; }
+    .dav-splash-logo{
+      width:min(168px, 42vw); height:auto;
+      filter: drop-shadow(0 18px 40px rgba(0,0,0,.55));
+      animation: davLogo 1.35s ease-in-out infinite;
+      border-radius: 22%;
+    }
+    @keyframes davLogo{
+      0%{ transform: translateY(0) rotate(-2deg) scale(1); }
+      50%{ transform: translateY(-8px) rotate(2deg) scale(1.03); }
+      100%{ transform: translateY(0) rotate(-2deg) scale(1); }
+    }
+    .dav-splash-title{
+      margin-top:14px; font-size:22px; font-weight:800; letter-spacing:.3px;
+      color:#eaf2ff;
+      text-shadow:0 10px 30px rgba(0,0,0,.5);
+    }
+    .dav-splash-sub{
+      margin-top:6px; font-size:13px; opacity:.8; color:#cfe3ff;
+    }
+    .dav-splash-sheen{
+      position:absolute; inset:-30%;
+      background: linear-gradient(120deg, transparent 35%, rgba(255,255,255,.12) 50%, transparent 65%);
+      transform: translateX(-45%) rotate(8deg);
+      animation: davSheen 1.9s ease-in-out infinite;
+      pointer-events:none;
+      mix-blend-mode: screen;
+    }
+    @keyframes davSheen{
+      0%{ transform: translateX(-45%) rotate(8deg); opacity:.0; }
+      15%{ opacity:.25; }
+      55%{ opacity:.22; }
+      100%{ transform: translateX(45%) rotate(8deg); opacity:.0; }
+    }
+  </style>
 
 </head>
 <body>
+
+<div id="davSplash" class="dav-splash" aria-hidden="true">
+  <div class="dav-splash-sheen"></div>
+  <div class="dav-splash-inner">
+    <img class="dav-splash-logo" src="./icon-512.png" alt="">
+    <div class="dav-splash-title">DavElec</div>
+    <div class="dav-splash-sub">Instalações • Cálculo • Quadros</div>
+  </div>
+</div>
+
   <div class="wrap"><div class="sheet">
     <div class="top">
       <div class="brand">
@@ -12701,6 +12868,28 @@ renderSavedBudgets();
 
 })();
 <\/script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js");});}</script>
+
+<script id="dav-splash-js">
+(function(){
+  function hideSplash(){
+    var el = document.getElementById("davSplash");
+    if(!el) return;
+    el.classList.add("hide");
+    setTimeout(function(){ el.remove(); }, 700);
+  }
+  // hide on load, but keep a minimum time so it feels premium
+  var start = Date.now();
+  window.addEventListener("load", function(){
+    var elapsed = Date.now() - start;
+    var wait = Math.max(450, 850 - elapsed);
+    setTimeout(hideSplash, wait);
+  });
+  // safety fallback
+  setTimeout(hideSplash, 2200);
+})();
+</script>
+
 </body></html>`;
 
       const w = window.open("", "_blank");
@@ -17741,30 +17930,25 @@ function installOpenSchemaFallback(){
 })();
 </script>
 
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js");});}</script>
 
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function () {
-    navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(function(){ });
-  });
-}
-</script>
-
-
-<script>
+<script id="dav-splash-js">
 (function(){
   function hideSplash(){
-    var el=document.getElementById("davelec_splash");
+    var el = document.getElementById("davSplash");
     if(!el) return;
     el.classList.add("hide");
-    setTimeout(function(){ try{ el.remove(); }catch(e){} }, 350);
+    setTimeout(function(){ el.remove(); }, 700);
   }
-  if (document.readyState === "complete" || document.readyState === "interactive") {
-    setTimeout(hideSplash, 250);
-  } else {
-    document.addEventListener("DOMContentLoaded", function(){ setTimeout(hideSplash, 250); });
-  }
-  window.addEventListener("load", function(){ setTimeout(hideSplash, 250); });
+  // hide on load, but keep a minimum time so it feels premium
+  var start = Date.now();
+  window.addEventListener("load", function(){
+    var elapsed = Date.now() - start;
+    var wait = Math.max(450, 850 - elapsed);
+    setTimeout(hideSplash, wait);
+  });
+  // safety fallback
+  setTimeout(hideSplash, 2200);
 })();
 </script>
 
