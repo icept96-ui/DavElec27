@@ -2,6 +2,18 @@
 
 <html lang="pt">
 <head>
+<script>
+/* GitHub Pages project URL fix: ensure trailing slash so relative files resolve */
+(function(){
+  try{
+    var p = location.pathname || "";
+    if (!p.endsWith("/") && p.split("/").pop().indexOf(".") === -1){
+      location.replace(p + "/" + location.search + location.hash);
+    }
+  }catch(e){}
+})();
+</script>
+
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>DavElec — v439 (Obras Anexos + ZIP)</title>
@@ -1441,19 +1453,6 @@ details.fold .foldBody{ padding:12px; border-top:1px solid rgba(255,255,255,.08)
   border-top: 1px solid rgba(255,255,255,0.10);
 }
 
-
-/* --- Esquemas Técnicos (PT) --- */
-#esquemas .schemWrap{display:flex;flex-direction:column;gap:12px}
-#esquemas .schemTop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
-#esquemas .schemTitle{font-weight:900;font-size:18px}
-#esquemas .schemPills{display:flex;gap:8px;flex-wrap:wrap}
-#esquemas .pill{padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);font-weight:800;font-size:12px;color:#d7e6ff}
-#esquemas svg{width:100%;height:auto;display:block}
-#esquemas .legend{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-#esquemas .legend .item{padding:10px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}
-#esquemas .legend .k{font-weight:900}
-#esquemas .legend .v{opacity:.9;line-height:1.35}
-
 </style>
 <script>
   // DavElec Stable Base
@@ -1851,55 +1850,14 @@ window.addEventListener('DOMContentLoaded', ()=>{
 #q_canvas .dinRow.din-can-right::after{ opacity:1; }
 </style>
 
-<script>
-/* DavElec GitHub Pages path fixer (avoid wrong relative fetch => token '<') */
-(function(){
-  try{
-    var p = location.pathname || "";
-    // If last segment has no dot and doesn't end with '/', enforce trailing slash
-    if (!p.endsWith("/")){
-      var last = p.split("/").pop();
-      if (last && last.indexOf(".") === -1){
-        location.replace(p + "/" + location.search + location.hash);
-      }
-    }
-  }catch(e){}
-})();
-</script>
-<script>
-/* Early error trap so we can see the "fast" error too */
-(function(){
-  function show(msg){
-    try{
-      var id="dav-boot-error";
-      var el=document.getElementById(id);
-      if(!el){
-        el=document.createElement("div");
-        el.id=id;
-        el.style.cssText="position:fixed;left:12px;right:12px;bottom:18px;z-index:999999;padding:12px 14px;border-radius:14px;background:rgba(0,0,0,.65);color:#fff;font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Arial;backdrop-filter:blur(6px);";
-        document.addEventListener("DOMContentLoaded",function(){document.body.appendChild(el);});
-      }
-      el.textContent=msg;
-    }catch(_){}
-  }
-  window.addEventListener("error", function(ev){
-    var m = ev && ev.message ? ev.message : "Erro JS";
-    if(ev && ev.filename) m += " @ " + ev.filename.split("/").slice(-1)[0] + ":" + (ev.lineno||0);
-    show("ERRO JS (BOOT): " + m);
-  });
-  window.addEventListener("unhandledrejection", function(ev){
-    var r = ev && ev.reason ? (ev.reason.message || String(ev.reason)) : "Promise rejection";
-    show("ERRO JS (PROMISE): " + r);
-  });
-})();
-</script>
-<link rel="manifest" href="manifest.webmanifest">
+<!-- ===== DavElec PWA (GitHub Pages safe) ===== -->
+<link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#0b1020">
-<link rel="icon" sizes="192x192" href="icon-192.png">
-<link rel="icon" sizes="512x512" href="icon-512.png">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+
 </head>
 <body>
 
@@ -1957,7 +1915,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
 <button class="tile" onclick="show('avarias', this)"><span class="ico">🛠️</span><span class="lbl">Avarias</span></button>
 <button class="tile" onclick="show('orcamentos', this)"><span class="ico">🧾</span><span class="lbl">Orçamentos</span></button>
 <button class="tile" onclick="show('quadro', this)"><span class="ico">🧰</span><span class="lbl">Quadro</span></button>
-<button class="tile" onclick="show('esquemas', this)"><span class="ico">📚</span><span class="lbl">Esquemas</span></button>
 </div>
 </div>
 </section>
@@ -2439,29 +2396,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
     </div>
 </div>
 </section>
-
-<!-- ========== ESQUEMAS TÉCNICOS (PT) ========== -->
-<section class="page" id="esquemas">
-<h2>Esquemas Técnicos (PT)</h2>
-<div class="small">Biblioteca de ligações — estilo manual técnico (Portugal). Cores: 🟤 Fase | 🔵 Neutro | 🟢🟡 Terra | ⚫ Retorno</div>
-
-<div class="card">
-  <div class="row" style="gap:8px;flex-wrap:wrap">
-    <button class="btn" onclick="Esq.open('int_simples')">🔌 Interruptor simples</button>
-    <button class="btn ghost" disabled title="Em breve">🔁 Vaivém</button>
-    <button class="btn ghost" disabled title="Em breve">🔀 Cruzamento</button>
-    <button class="btn ghost" disabled title="Em breve">⏱️ Teleruptor</button>
-  </div>
-  <div class="hr"></div>
-  <div class="small">Dica: toca no esquema para ampliar (zoom do navegador).</div>
-</div>
-
-<div id="esqView" class="card schemWrap">
-  <div class="small">Seleciona um esquema acima.</div>
-</div>
-</section>
-
-
 <!-- ========== QUADRO ========== -->
 <section class="page" id="quadro" style="display:none">
 <h2>Quadro</h2>
@@ -3313,7 +3247,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
 <button onclick="show('orcamentos',this)"><span class="ico">🧾</span><span>Orçamento</span></button>
 <button onclick="show('obra',this)"><span class="ico">📂</span><span>Obra</span></button>
 <button onclick="show('formulas',this)"><span class="ico">🧮</span><span>Fórmulas</span></button>
-<button onclick="show('esquemas',this)"><span class="ico">📚</span><span>Esquemas</span></button>
 <button onclick="show('avarias',this)"><span class="ico">🛠️</span><span>Avarias</span></button>
 </nav>
 <!-- ========== MODAL CÂMARA ========== -->
@@ -9840,30 +9773,26 @@ function quadro_export_pdf(){
 <\/script>
 
 <script>
-/* DavElec PWA bootstrap (v620) - safe for GitHub Pages project sites */
+/* DavElec PWA: minimal service worker registration (no caching) */
 (function(){
-  function basePath(){
-    try {
-      // directory of current URL, always ends with '/'
-      return new URL('.', location.href).pathname;
-    } catch(e) { return '/'; }
-  }
-  var BASE = basePath();
-  // Register SW only on https (or localhost) and only if supported
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      try {
-        var swUrl = BASE + 'sw.js?v=1772645275';
-        navigator.serviceWorker.register(swUrl, { scope: BASE }).catch(function(err){
-          console.warn('SW register failed', err);
-        });
-      } catch(e) {
-        console.warn('SW register exception', e);
+  if (!('serviceWorker' in navigator)) return;
+  window.addEventListener('load', async function(){
+    try{
+      // If an old/foreign SW is controlling this scope, replace it
+      const reg = await navigator.serviceWorker.getRegistration();
+      if (reg && reg.active && reg.active.scriptURL && !reg.active.scriptURL.endsWith('/sw.js')){
+        await reg.unregister();
+        location.reload();
+        return;
       }
-    });
-  }
+      await navigator.serviceWorker.register('./sw.js', { scope: './' });
+    }catch(e){
+      console.warn('SW registration failed', e);
+    }
+  });
 })();
 </script>
+
 </body>
 </html>`;
 
@@ -17811,227 +17740,6 @@ function installOpenSchemaFallback(){
     boot();
   }
   window.addEventListener('pageshow', function(){ setTimeout(function(){ try{ initDinCarousel(); }catch(e){} }, 80); });
-})();
-</script>
-
-
-<script>
-/* ===== DavElec: Esquemas Técnicos (PT) ===== */
-(function(){
-  function byId(id){ return document.getElementById(id); }
-
-  const SCHEMAS = {
-    int_simples: {
-      title: "Interruptor simples (PT)",
-      pills: ["Iluminação", "230 V", "1 circuito"],
-      tech: [
-        {k:"Cabo", v:"3×1,5 mm² (L, N, PE) + retorno (Ret) no tubo até ao ponto de luz"},
-        {k:"Proteção", v:"DJ C10 (iluminação) + ID 30 mA (tipo AC/A conforme cargas)"},
-        {k:"Nota", v:"O interruptor corta a FASE (L). Neutro nunca deve ser cortado no comando."}
-      ],
-      errors: [
-        "Cortar o NEUTRO em vez da FASE (perigoso e errado).",
-        "Não levar PE (terra) ao ponto de luz / caixa metálica.",
-        "Confundir retorno com neutro (lâmpada fica sempre ligada ou não liga).",
-        "Em caixas de derivação: neutros de circuitos diferentes misturados."
-      ],
-      svg_func: `
-<svg viewBox="0 0 960 430" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Esquema elétrico funcional - interruptor simples">
-  <defs>
-    <style>
-      .box{fill:rgba(255,255,255,.03);stroke:rgba(255,255,255,.14);stroke-width:2}
-      .t{fill:#eaf2ff;font:700 16px system-ui,Segoe UI,Roboto,Arial}
-      .s{fill:#a9b8d6;font:600 13px system-ui,Segoe UI,Roboto,Arial}
-      .w{stroke-linecap:round;stroke-width:8;fill:none}
-      .thin{stroke-width:3}
-    </style>
-  </defs>
-
-  <!-- blocos -->
-  <rect class="box" x="40" y="70" width="250" height="290" rx="18"/>
-  <text class="t" x="70" y="105">Quadro / Alimentação</text>
-  <text class="s" x="70" y="130">Saída circuito iluminação</text>
-
-  <rect class="box" x="350" y="70" width="250" height="290" rx="18"/>
-  <text class="t" x="380" y="105">Interruptor</text>
-  <text class="s" x="380" y="130">1P (corta L)</text>
-
-  <rect class="box" x="660" y="70" width="260" height="290" rx="18"/>
-  <text class="t" x="690" y="105">Ponto de luz</text>
-  <text class="s" x="690" y="130">Lâmpada</text>
-
-  <!-- símbolos simples -->
-  <!-- interruptor -->
-  <circle cx="420" cy="220" r="10" fill="#fff" opacity="0.12" stroke="rgba(255,255,255,.25)" stroke-width="2"/>
-  <circle cx="520" cy="220" r="10" fill="#fff" opacity="0.12" stroke="rgba(255,255,255,.25)" stroke-width="2"/>
-  <line x1="430" y1="210" x2="510" y2="190" class="thin" stroke="rgba(255,255,255,.45)"/>
-  <text class="s" x="410" y="255">L IN</text>
-  <text class="s" x="495" y="255">RET OUT</text>
-
-  <!-- lâmpada -->
-  <circle cx="790" cy="210" r="34" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.25)" stroke-width="3"/>
-  <line x1="765" y1="185" x2="815" y2="235" class="thin" stroke="rgba(255,255,255,.35)"/>
-  <line x1="815" y1="185" x2="765" y2="235" class="thin" stroke="rgba(255,255,255,.35)"/>
-  <text class="s" x="760" y="270">Lâmpada</text>
-
-  <!-- fios -->
-  <!-- L (fase) -->
-  <path class="w" d="M120 170 C 240 170, 300 170, 350 170" stroke="#8b5a2b"/>
-  <text class="s" x="90" y="165">L (Fase)</text>
-
-  <path class="w" d="M350 170 L 420 170 L 420 220" stroke="#8b5a2b"/>
-
-  <!-- Retorno -->
-  <path class="w" d="M520 220 L 520 170 L 660 170" stroke="#111"/>
-  <text class="s" x="515" y="160">Ret</text>
-
-  <path class="w" d="M660 170 L 756 170 L 756 210" stroke="#111"/>
-
-  <!-- N (neutro) -->
-  <path class="w" d="M120 250 C 330 250, 520 250, 756 250" stroke="#2b6cb0"/>
-  <text class="s" x="90" y="245">N (Neutro)</text>
-  <path class="w" d="M756 250 L 756 210" stroke="#2b6cb0"/>
-
-  <!-- PE (terra) -->
-  <path class="w" d="M120 320 C 330 320, 520 320, 756 320" stroke="#2f855a"/>
-  <text class="s" x="90" y="315">PE (Terra)</text>
-
-  <!-- bornes no ponto de luz -->
-  <text class="s" x="850" y="175">L</text>
-  <text class="s" x="850" y="255">N</text>
-  <text class="s" x="850" y="325">PE</text>
-</svg>
-      `,
-      svg_real: `
-<svg viewBox="0 0 960 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Esquema de ligação real - interruptor simples">
-  <defs>
-    <style>
-      .box{fill:rgba(255,255,255,.03);stroke:rgba(255,255,255,.14);stroke-width:2}
-      .t{fill:#eaf2ff;font:800 16px system-ui,Segoe UI,Roboto,Arial}
-      .s{fill:#a9b8d6;font:600 13px system-ui,Segoe UI,Roboto,Arial}
-      .w{stroke-linecap:round;stroke-width:8;fill:none}
-      .thin{stroke-width:3}
-    </style>
-  </defs>
-
-  <!-- Caixas -->
-  <rect class="box" x="70" y="80" width="300" height="160" rx="18"/>
-  <text class="t" x="95" y="115">Caixa de derivação</text>
-  <text class="s" x="95" y="140">Entradas/saídas do circuito</text>
-
-  <rect class="box" x="70" y="300" width="300" height="160" rx="18"/>
-  <text class="t" x="95" y="335">Caixa aparelhagem</text>
-  <text class="s" x="95" y="360">Interruptor</text>
-
-  <rect class="box" x="520" y="170" width="370" height="200" rx="18"/>
-  <text class="t" x="545" y="205">Ponto de luz</text>
-  <text class="s" x="545" y="230">Lâmpada / suporte</text>
-
-  <!-- Interruptor dentro -->
-  <circle cx="170" cy="390" r="10" fill="#fff" opacity="0.12" stroke="rgba(255,255,255,.25)" stroke-width="2"/>
-  <circle cx="270" cy="390" r="10" fill="#fff" opacity="0.12" stroke="rgba(255,255,255,.25)" stroke-width="2"/>
-  <line x1="180" y1="382" x2="260" y2="362" class="thin" stroke="rgba(255,255,255,.45)"/>
-  <text class="s" x="150" y="425">L</text>
-  <text class="s" x="255" y="425">Ret</text>
-
-  <!-- Lâmpada -->
-  <circle cx="705" cy="285" r="40" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.25)" stroke-width="3"/>
-  <line x1="675" y1="255" x2="735" y2="315" class="thin" stroke="rgba(255,255,255,.35)"/>
-  <line x1="735" y1="255" x2="675" y2="315" class="thin" stroke="rgba(255,255,255,.35)"/>
-
-  <!-- Cabos / trajetos (representação real) -->
-  <!-- Da derivação para aparelhagem: L e Ret -->
-  <path class="w" d="M220 240 L 220 300" stroke="#8b5a2b"/>
-  <text class="s" x="235" y="285">L</text>
-
-  <path class="w" d="M300 240 L 300 300" stroke="#111"/>
-  <text class="s" x="315" y="285">Ret</text>
-
-  <!-- Da derivação para ponto de luz: N e PE e Ret -->
-  <path class="w" d="M370 170 C 460 170, 500 190, 520 220" stroke="#2b6cb0"/>
-  <text class="s" x="410" y="155">N</text>
-
-  <path class="w" d="M370 210 C 450 240, 500 260, 520 280" stroke="#2f855a"/>
-  <text class="s" x="410" y="235">PE</text>
-
-  <path class="w" d="M370 130 C 460 110, 520 120, 520 250" stroke="#111"/>
-  <text class="s" x="410" y="120">Ret</text>
-
-  <!-- Entradas na derivação -->
-  <text class="s" x="95" y="175">Entrada L/N/PE (do quadro)</text>
-  <path class="w" d="M110 195 L 200 195" stroke="#8b5a2b"/>
-  <path class="w" d="M110 215 L 200 215" stroke="#2b6cb0"/>
-  <path class="w" d="M110 235 L 200 235" stroke="#2f855a"/>
-
-  <!-- Ligações internas na derivação (simplificadas) -->
-  <text class="s" x="210" y="195">L → Interruptor</text>
-  <text class="s" x="210" y="215">N → Ponto luz</text>
-  <text class="s" x="210" y="235">PE → Ponto luz</text>
-
-  <!-- Bornes no ponto de luz -->
-  <text class="s" x="825" y="260">L</text>
-  <text class="s" x="825" y="290">N</text>
-  <text class="s" x="825" y="320">PE</text>
-</svg>
-      `
-    }
-  };
-
-  function renderSchema(id){
-    const box = byId("esqView");
-    const s = SCHEMAS[id];
-    if(!box || !s) return;
-
-    box.innerHTML = `
-      <div class="schemTop">
-        <div>
-          <div class="schemTitle">${s.title}</div>
-          <div class="schemPills">${(s.pills||[]).map(p=>`<span class="pill">${p}</span>`).join("")}</div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button class="btn small" onclick="Esq.back()">← Lista</button>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:6px">
-        <div style="font-weight:900;margin-bottom:8px">1) Esquema elétrico funcional</div>
-        ${s.svg_func}
-      </div>
-
-      <div class="card">
-        <div style="font-weight:900;margin-bottom:8px">2) Ligação real (caixas)</div>
-        ${s.svg_real}
-      </div>
-
-      <div class="legend">
-        ${(s.tech||[]).map(x=>`
-          <div class="item">
-            <div class="k">${x.k}</div>
-            <div class="v">${x.v}</div>
-          </div>
-        `).join("")}
-      </div>
-
-      <div class="card">
-        <div style="font-weight:900;margin-bottom:8px">Erros comuns</div>
-        <ul style="margin:0 0 0 18px;line-height:1.55">
-          ${(s.errors||[]).map(e=>`<li>${e}</li>`).join("")}
-        </ul>
-      </div>
-    `;
-    box.scrollIntoView({behavior:"smooth", block:"start"});
-  }
-
-  window.Esq = {
-    open: function(id){ renderSchema(id); },
-    back: function(){
-      const box = byId("esqView");
-      if(box){
-        box.innerHTML = '<div class="small">Seleciona um esquema acima.</div>';
-        box.scrollIntoView({behavior:"smooth", block:"start"});
-      }
-    }
-  };
 })();
 </script>
 
