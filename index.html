@@ -3,6 +3,36 @@
 <html lang="pt">
 <head>
 <meta charset="utf-8"/>
+<script>
+/* DavElec PWA self-heal bootstrap (v617) */
+(function(){
+  try {
+    var BUILD = "v617";
+    var key = "__DAVELEC_BUILD__";
+    var prev = localStorage.getItem(key);
+    if (prev !== BUILD) {
+      localStorage.setItem(key, BUILD);
+      // Unregister any existing service workers and clear caches to prevent "token <" from stale cached HTML
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          regs.forEach(function(r){ try{ r.unregister(); }catch(e){} });
+        });
+      }
+      if (window.caches && caches.keys) {
+        caches.keys().then(function(keys) {
+          return Promise.all(keys.map(function(k){ return caches.delete(k); }));
+        }).catch(function(){});
+      }
+      // Force a clean reload once
+      if (!location.search.includes('reloaded=1')) {
+        var sep = location.search ? '&' : '?';
+        location.replace(location.pathname + location.search + sep + 'reloaded=1' + location.hash);
+      }
+    }
+  } catch(e) {}
+})();
+</script>
+
 
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#0b1020">
