@@ -3,6 +3,46 @@
 <html lang="pt">
 <head>
 <meta charset="utf-8"/>
+
+<script>
+/* DavElec PWA self-heal (GitHub Pages caches) v618 */
+(function(){
+  var V="618";
+  window.__DAVELEC_BUILD__ = V;
+  function hardResetPWA(){
+    try { sessionStorage.setItem('__dav_pwa_reset_done__','1'); } catch(_e){}
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations()
+        .then(function(regs){ return Promise.all(regs.map(function(r){ return r.unregister(); })); })
+        .then(function(){ return caches && caches.keys ? caches.keys().then(function(keys){ return Promise.all(keys.map(function(k){ return caches.delete(k); })); }) : null; })
+        .finally(function(){
+          try {
+            var url = new URL(location.href);
+            url.searchParams.set('v', V);
+            location.replace(url.toString());
+          } catch(e) {
+            location.reload();
+          }
+        });
+    } else {
+      location.reload();
+    }
+  }
+  window.addEventListener('error', function(e){
+    var msg = (e && e.message) ? String(e.message) : '';
+    if (!msg) return;
+    var hit = msg.indexOf("Unexpected token '<'") !== -1 ||
+              msg.indexOf("Unexpected end of input") !== -1 ||
+              msg.indexOf("Cannot access") !== -1 ||
+              msg.indexOf("is not defined") !== -1;
+    if (!hit) return;
+    try {
+      if (sessionStorage.getItem('__dav_pwa_reset_done__')) return;
+    } catch(_e){}
+    hardResetPWA();
+  });
+})();
+</script>
 <script>
 /* DavElec PWA self-heal bootstrap (v617) */
 (function(){
@@ -9841,7 +9881,7 @@ function quadro_export_pdf(){
 
 })();
 <\/script>
-<script src="./pwa-register.js" defer></script>
+<script src="./pwa-register.js?v=618" defer></script>
 </body>
 </html>`;
 

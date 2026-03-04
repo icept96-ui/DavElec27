@@ -1,4 +1,4 @@
-/* DavElec minimal SW (GitHub Pages safe) - v617 */
+/* DavElec minimal SW (GitHub Pages safe) - v618 */
 self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
